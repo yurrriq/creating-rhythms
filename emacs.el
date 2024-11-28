@@ -54,12 +54,16 @@
 
 (use-package flycheck)
 
+(use-package haskell-mode
+  :hook (haskell-mode . interactive-haskell-mode))
+
 (use-package hl-todo
   :demand
   :config (global-hl-todo-mode t))
 
 (use-package lsp-mode
   :hook ((c-mode
+          haskell-mode
           nix-mode
           rustic-mode)
          . lsp-deferred)
@@ -74,9 +78,12 @@
   :config
   (advice-add 'lsp :before #'direnv-update-environment))
 
+(use-package lsp-haskell)
+
 (use-package lsp-ui
   :hook
   ((c-mode
+    haskell-mode
     nix-mode
     rustic-mode)
    . lsp-ui-mode)
@@ -115,6 +122,12 @@
 (use-package nyan-mode
   :demand
   :config (nyan-mode 1))
+
+(use-package ormolu
+ :hook (haskell-mode . ormolu-format-on-save-mode)
+ :bind
+ (:map haskell-mode-map
+   ("C-c r" . ormolu-format-buffer)))
 
 (use-package paredit
   :hook (emacs-lisp-mode . paredit-mode))

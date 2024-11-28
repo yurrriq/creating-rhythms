@@ -1,0 +1,24 @@
+name: CreatingRhythms
+version: !include "./VERSION"
+synopsis: A Haskell port of the code from the book Creating Rhythms
+author: Eric Bailey
+maintainer: eric@ericb.me
+github: yurrriq/creating-rhythms
+dependencies:
+  - base
+ghc-options:
+  - -Wall
+  - -Werror
+default-extensions:
+  - OverloadedStrings
+library:
+  ghc-options:
+    - -fwarn-incomplete-patterns
+  source-dirs: src
+  dependencies: []
+# executable:
+#   source-dirs: app
+#   main: Main
+#   ghc-options:
+#     - -threaded
+#   dependencies: []

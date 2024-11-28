@@ -76,6 +76,7 @@
           ];
 
           nativeBuildInputs = with pkgs; [
+            cabal-install
             ccls
             (
               fenix.complete.withComponents [
@@ -87,6 +88,13 @@
               ]
             )
             gcc
+            ghc
+            ghcid
+            haskell-language-server
+            haskellPackages.hpack
+            haskellPackages.hlint
+            haskellPackages.ormolu
+            haskellPackages.pointfree
             myEmacs
             nixd
             rust-analyzer-nightly
@@ -104,7 +112,9 @@
           programs = {
             clang-format.enable = true;
             deadnix.enable = true;
+            hlint.enable = true;
             nixpkgs-fmt.enable = true;
+            ormolu.enable = true;
             rustfmt = {
               enable = true;
               package = pkgs.fenix.complete.rustfmt;
