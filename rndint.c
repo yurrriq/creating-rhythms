@@ -1,7 +1,7 @@
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
 #include <math.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 /*
  *                            COPYRIGHT
@@ -38,20 +38,19 @@
 
 // Compile: gcc -lm -o rndint rndint.c
 
-int main( int argc, char *argv[] )
+int main(int argc, char *argv[])
 {
-  if( argc < 5 )
-    {
-      printf("usage: %s m s c n\n", argv[0]);
-      printf("  Generates random numbers with specified correlation\n");
-      printf("  m = range of numbers, 0 to m\n");
-      printf("  s = starting number, 0 to m\n");
-      printf("  c = degree of correlation\n");
-      printf("      0 = total correlation (all numbers = s)\n");
-      printf("      m = no correlation (each number is independent)\n");
-      printf("  n = how many random numbers to generate\n");
-      exit( -1 );
-    }
+  if (argc < 5) {
+    printf("usage: %s m s c n\n", argv[0]);
+    printf("  Generates random numbers with specified correlation\n");
+    printf("  m = range of numbers, 0 to m\n");
+    printf("  s = starting number, 0 to m\n");
+    printf("  c = degree of correlation\n");
+    printf("      0 = total correlation (all numbers = s)\n");
+    printf("      m = no correlation (each number is independent)\n");
+    printf("  n = how many random numbers to generate\n");
+    exit(-1);
+  }
 
   int i, j, k;
   int m = atoi(argv[1]);
@@ -63,16 +62,21 @@ int main( int argc, char *argv[] )
 
   //  printf("%d ", n);
 
-  for(i=0; i<n; ++i){
+  for (i = 0; i < n; ++i) {
     printf("%d ", s);
-    if(c > 0){
-      for(j=m; j>m-c; --j){
-	k = RAND_MAX / j;
-        if(rand() < s*k) --s;}
+    if (c > 0) {
+      for (j = m; j > m - c; --j) {
+        k = RAND_MAX / j;
+        if (rand() < s * k)
+          --s;
+      }
       k = RAND_MAX / 2;
-      for(j=0; j<c; ++j)
-        if(rand() < k) ++s;}}
+      for (j = 0; j < c; ++j)
+        if (rand() < k)
+          ++s;
+    }
+  }
 
   printf("\n");
-  return(0);
+  return (0);
 }

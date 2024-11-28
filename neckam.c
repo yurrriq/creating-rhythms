@@ -1,7 +1,7 @@
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
 #include <math.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 /*
  *                            COPYRIGHT
@@ -46,9 +46,10 @@ int nap;
 int allowed(int p)
 {
   int i;
-  for(i=0; i<nap; ++i)
-    if(p == aparts[i]) return(1);
-  return(0);
+  for (i = 0; i < nap; ++i)
+    if (p == aparts[i])
+      return (1);
+  return (0);
 }
 
 // k = length of necklace
@@ -58,41 +59,48 @@ int allowed(int p)
 
 void neckbin(int k, int l, int m, int p)
 {
-  if(k > n){
-    if((n%l)==0 && allowed(p) && p<=n && m==n1){
-      for(k=1; k<n+1; ++k) printf("%d",b[k]);
-      printf("\n");}}
-  else{
-    b[k]=b[k-l];
-    if(b[k]==1){
-      if(allowed(p) || k==1) neckbin(k+1,l,m+1,1);
-      b[k]=0;
-      neckbin(k+1,k,m,p+1);}
-    else
-      neckbin(k+1,l,m,p+1);}
+  if (k > n) {
+    if ((n % l) == 0 && allowed(p) && p <= n && m == n1) {
+      for (k = 1; k < n + 1; ++k)
+        printf("%d", b[k]);
+      printf("\n");
+    }
+  } else {
+    b[k] = b[k - l];
+    if (b[k] == 1) {
+      if (allowed(p) || k == 1)
+        neckbin(k + 1, l, m + 1, 1);
+      b[k] = 0;
+      neckbin(k + 1, k, m, p + 1);
+    } else
+      neckbin(k + 1, l, m, p + 1);
+  }
 }
 
 /*******************************************************************/
 
-int main( int argc, char *argv[] )
+int main(int argc, char *argv[])
 {
-  if(argc < 4){
+  if (argc < 4) {
     printf("usage: %s n m p1 p2 ...\n", argv[0]);
-    printf("  Generates binary necklaces of length n with m ones and allowed parts pi.\n");
-    exit(-1);}
+    printf("  Generates binary necklaces of length n with m ones and allowed "
+           "parts pi.\n");
+    exit(-1);
+  }
 
   n = atoi(argv[1]);
   n1 = atoi(argv[2]);
-  b = (int *)malloc((n+2)*sizeof(int));
+  b = (int *)malloc((n + 2) * sizeof(int));
   b[0] = 1;
 
   nap = argc - 3;
-  aparts = (int *)malloc(nap*sizeof(int));
+  aparts = (int *)malloc(nap * sizeof(int));
   int i;
-  for(i=0; i<nap; ++i) aparts[i] = atoi(argv[3+i]);
+  for (i = 0; i < nap; ++i)
+    aparts[i] = atoi(argv[3 + i]);
 
-  neckbin(1,1,0,1);
+  neckbin(1, 1, 0, 1);
   free(b);
   free(aparts);
-  return(0);
+  return (0);
 }

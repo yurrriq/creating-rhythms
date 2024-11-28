@@ -1,7 +1,7 @@
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
 #include <math.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 /*
  *                            COPYRIGHT
@@ -38,14 +38,13 @@
 
 // Compile: gcc -lm -o compmrnd compmrnd.c
 
-int main( int argc, char *argv[] )
+int main(int argc, char *argv[])
 {
-  if( argc < 3 )
-    {
-      printf("usage: %s n m\n", argv[0]);
-      printf("  Generate random composition of n into m parts\n");
-      exit( -1 );
-    }
+  if (argc < 3) {
+    printf("usage: %s n m\n", argv[0]);
+    printf("  Generate random composition of n into m parts\n");
+    exit(-1);
+  }
 
   int j, p;
   int np, n = atoi(argv[1]);
@@ -53,15 +52,16 @@ int main( int argc, char *argv[] )
 
   srand(time(0));
 
-  for(mp=m-1, np=n-1, j=1; mp>0; --np){
-    p = mp*(RAND_MAX/np);
-    if(rand() < p){
+  for (mp = m - 1, np = n - 1, j = 1; mp > 0; --np) {
+    p = mp * (RAND_MAX / np);
+    if (rand() < p) {
       printf("%d ", j);
       --mp;
-      j=1;}
-    else
-      ++j;}
+      j = 1;
+    } else
+      ++j;
+  }
 
-  printf("%d\n", j+np);
-  return(0);
+  printf("%d\n", j + np);
+  return (0);
 }

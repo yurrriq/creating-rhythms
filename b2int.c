@@ -1,7 +1,7 @@
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
 #include <math.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 /*
  *                            COPYRIGHT
@@ -49,12 +49,15 @@ int main(int argc, char *argv[])
   char line[128];
   int j, k, nbit;
 
-  while(gets(line)){
+  while (gets(line)) {
     nbit = strlen(line);
-    for(j=0; j<nbit;){
-      k=1;
-      while(line[++j]!='1' && j<nbit) ++k;
-      printf("%d ", k);}
-    printf("\n");}
-  return(0);
+    for (j = 0; j < nbit;) {
+      k = 1;
+      while (line[++j] != '1' && j < nbit)
+        ++k;
+      printf("%d ", k);
+    }
+    printf("\n");
+  }
+  return (0);
 }

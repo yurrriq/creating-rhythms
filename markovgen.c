@@ -1,7 +1,7 @@
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
 #include <math.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 /*
  *                            COPYRIGHT
@@ -38,45 +38,52 @@
 
 // Compile: gcc -lm -o markovgen markovgen.c
 
-int main( int argc, char *argv[] )
+int main(int argc, char *argv[])
 {
-  if( argc < 4 )
-    {
-      printf("usage: %s mfile s n\n", argv[0]);
-      printf("  Generates random numbers using a Markov chain\n");
-      printf("  mfile = transition matrix file name\n");
-      printf("  s = starting state\n");
-      printf("  n = how many random numbers to generate\n");
-      exit( -1 );
-    }
+  if (argc < 4) {
+    printf("usage: %s mfile s n\n", argv[0]);
+    printf("  Generates random numbers using a Markov chain\n");
+    printf("  mfile = transition matrix file name\n");
+    printf("  s = starting state\n");
+    printf("  n = how many random numbers to generate\n");
+    exit(-1);
+  }
 
   int i, j, k;
   FILE *fp = fopen(argv[1], "r");
   int ns; // number of states
-  fscanf(fp,"%d",&ns);
-  double *M = (double *)malloc(ns*ns*sizeof(double));
+  fscanf(fp, "%d", &ns);
+  double *M = (double *)malloc(ns * ns * sizeof(double));
   double *pM, u, x;
   int s = atoi(argv[2]);
   int n = atoi(argv[3]);
 
-  for(i=0, pM=M; i<ns; ++i, pM+=ns)
-    for(j=0; j<ns; ++j) fscanf(fp,"%lf", pM + j);
+  for (i = 0, pM = M; i < ns; ++i, pM += ns)
+    for (j = 0; j < ns; ++j)
+      fscanf(fp, "%lf", pM + j);
   fclose(fp);
 
-  for(i=0, pM=M; i<ns; ++i, pM+=ns){
-    for(j=0; j<ns; ++j) printf("%lf ", pM[j]);
-    printf("\n");}
+  for (i = 0, pM = M; i < ns; ++i, pM += ns) {
+    for (j = 0; j < ns; ++j)
+      printf("%lf ", pM[j]);
+    printf("\n");
+  }
 
   srand(time(0));
 
-  for(i=0; i<n; ++i){
+  for (i = 0; i < n; ++i) {
     printf("%d ", s);
     pM = M + ns * s;
-    u = (double)rand()/RAND_MAX;
-    for(j=0, x=0.0; j<ns; ++j){
+    u = (double)rand() / RAND_MAX;
+    for (j = 0, x = 0.0; j < ns; ++j) {
       x += pM[j];
-      if(u < x){s = j; break;}}}
+      if (u < x) {
+        s = j;
+        break;
+      }
+    }
+  }
 
   printf("\n");
-  return(0);
+  return (0);
 }

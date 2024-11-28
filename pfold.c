@@ -1,7 +1,7 @@
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
 #include <math.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 /*
  *                            COPYRIGHT
@@ -39,45 +39,45 @@
 /* Compile: gcc -lm -o pfold pfold.c */
 
 // oddeven finds a and b such that n = 2^a * (2*b+1)
-void oddeven( unsigned int n, unsigned int *a, unsigned int *b )
+void oddeven(unsigned int n, unsigned int *a, unsigned int *b)
 {
-  unsigned int k,l;
+  unsigned int k, l;
 
   // two's complement of n = -n or ~n + 1
-  l = n & -n;  // this is 2^a
-  *b = (n / l - 1)/2;
-  for(k=0; l>1; ++k) l>>=1;
+  l = n & -n; // this is 2^a
+  *b = (n / l - 1) / 2;
+  for (k = 0; l > 1; ++k)
+    l >>= 1;
   *a = k;
   return;
 }
 
-int main( int argc, char *argv[] )
+int main(int argc, char *argv[])
 {
-  if(argc < 4)
-    {
-      printf("usage: %s n m f\n", argv[0]);
-      printf("  Generates fold sequences.\n");
-      printf("  n = number of terms, 1,3,7,15,31,63,127,...\n");
-      printf("  m = number of bits\n");
-      printf("  f = function number 0 -> 2^m-1\n");
-      exit(-1);
-    }
+  if (argc < 4) {
+    printf("usage: %s n m f\n", argv[0]);
+    printf("  Generates fold sequences.\n");
+    printf("  n = number of terms, 1,3,7,15,31,63,127,...\n");
+    printf("  m = number of bits\n");
+    printf("  f = function number 0 -> 2^m-1\n");
+    exit(-1);
+  }
 
-  unsigned int n = (unsigned int)strtoul(argv[1],NULL,10);
-  unsigned int m = (unsigned int)strtoul(argv[2],NULL,10);
-  unsigned int f = (unsigned int)strtoul(argv[3],NULL,10);
+  unsigned int n = (unsigned int)strtoul(argv[1], NULL, 10);
+  unsigned int m = (unsigned int)strtoul(argv[2], NULL, 10);
+  unsigned int f = (unsigned int)strtoul(argv[3], NULL, 10);
   unsigned int i, j, k;
   unsigned int b;
 
-  for(i=1; i<=n; ++i)
-    {
-      oddeven(i, &k, &j);
-      k = k % m;
-      b =  f & (1 << k) ? 1 : 0;
-      if((2*j+1) % 4 > 1) b = 1 - b;
-      printf("%u", b);
-    }
+  for (i = 1; i <= n; ++i) {
+    oddeven(i, &k, &j);
+    k = k % m;
+    b = f & (1 << k) ? 1 : 0;
+    if ((2 * j + 1) % 4 > 1)
+      b = 1 - b;
+    printf("%u", b);
+  }
 
   printf("\n");
-  return(0);
+  return (0);
 }

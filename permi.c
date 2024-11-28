@@ -1,7 +1,7 @@
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
 #include <math.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 /*
  *                            COPYRIGHT
@@ -38,36 +38,44 @@
 
 // Compile: gcc -lm -o permi permi.c
 
-int main( int argc, char *argv[] )
+int main(int argc, char *argv[])
 {
-  if( argc < 2 )
-    {
-      printf("usage: %s a1 a2 ... an\n", argv[0]);
-      printf("  Generates permutations of the integers ai>=0.\n");
-      printf("  To generate all permutations they must be ordered a1<a2<...<an.\n");
-      printf("  Any other order will only generate permutations that are larger\n");
-      printf("  in lexicographic order.\n");
-      exit( -1 );
-    }
+  if (argc < 2) {
+    printf("usage: %s a1 a2 ... an\n", argv[0]);
+    printf("  Generates permutations of the integers ai>=0.\n");
+    printf(
+        "  To generate all permutations they must be ordered a1<a2<...<an.\n");
+    printf(
+        "  Any other order will only generate permutations that are larger\n");
+    printf("  in lexicographic order.\n");
+    exit(-1);
+  }
 
   int i, j, k, m, n = argc - 1;
-  int *a = (int *)malloc((n+1)*sizeof(int));
+  int *a = (int *)malloc((n + 1) * sizeof(int));
   a[0] = -1;
-  for(i=1; i<=n; ++i) a[i] = atoi(argv[i]);
-  do{
-    for(i=1; i<=n; ++i) printf("%d ",a[i]);
+  for (i = 1; i <= n; ++i)
+    a[i] = atoi(argv[i]);
+  do {
+    for (i = 1; i <= n; ++i)
+      printf("%d ", a[i]);
     printf("\n");
-    for(i=n-1; i>0 && a[i]>=a[i+1]; --i);
-    if(i == 0) break;
-    for(j=n; a[i]>=a[j]; --j);
+    for (i = n - 1; i > 0 && a[i] >= a[i + 1]; --i)
+      ;
+    if (i == 0)
+      break;
+    for (j = n; a[i] >= a[j]; --j)
+      ;
     m = a[j];
-    a[j]=a[i];
-    a[i]=m;
-    for(j=i+1, k=n; j<k; ++j, --k){
+    a[j] = a[i];
+    a[i] = m;
+    for (j = i + 1, k = n; j < k; ++j, --k) {
       m = a[j];
-      a[j]=a[k];
-      a[k]=m;}} while(1);
+      a[j] = a[k];
+      a[k] = m;
+    }
+  } while (1);
 
   free(a);
-  return(0);
+  return (0);
 }

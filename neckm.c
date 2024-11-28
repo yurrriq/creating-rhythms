@@ -1,7 +1,7 @@
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
 #include <math.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 /*
  *                            COPYRIGHT
@@ -47,37 +47,39 @@ int *b;
 
 void neckbin(int k, int l, int m)
 {
-  if(k > n){
-    if((n%l)==0 && m==n1){
-      for(k=1; k<n+1; ++k) printf("%d",b[k]);
-      printf("\n");}}
-  else{
-    b[k]=b[k-l];
-    if(b[k]==1){
-      neckbin(k+1,l,m+1);
-      b[k]=0;
-      neckbin(k+1,k,m);}
-    else
-      neckbin(k+1,l,m);}
+  if (k > n) {
+    if ((n % l) == 0 && m == n1) {
+      for (k = 1; k < n + 1; ++k)
+        printf("%d", b[k]);
+      printf("\n");
+    }
+  } else {
+    b[k] = b[k - l];
+    if (b[k] == 1) {
+      neckbin(k + 1, l, m + 1);
+      b[k] = 0;
+      neckbin(k + 1, k, m);
+    } else
+      neckbin(k + 1, l, m);
+  }
 }
 
 /*******************************************************************/
 
-int main( int argc, char *argv[] )
+int main(int argc, char *argv[])
 {
-  if(argc < 2)
-    {
-      printf("usage: %s n m\n", argv[0]);
-      printf("  Generates all binary necklaces of length n with m ones.\n");
-      exit(-1);
-    }
+  if (argc < 2) {
+    printf("usage: %s n m\n", argv[0]);
+    printf("  Generates all binary necklaces of length n with m ones.\n");
+    exit(-1);
+  }
 
   n = atoi(argv[1]);
   n1 = atoi(argv[2]);
-  b = (int *)malloc((n+2)*sizeof(int));
+  b = (int *)malloc((n + 2) * sizeof(int));
   b[0] = 1;
 
-  neckbin(1,1,0);
+  neckbin(1, 1, 0);
   free(b);
-  return(0);
+  return (0);
 }

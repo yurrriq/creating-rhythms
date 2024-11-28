@@ -1,7 +1,7 @@
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
 #include <math.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 /*
  *                            COPYRIGHT
@@ -49,13 +49,16 @@ int main(int argc, char *argv[])
   char line[256];
   int n, i, j, k;
 
-  while(gets(line)){
+  while (gets(line)) {
     n = strlen(line);
-    for(i=0; i<n; ++i)
-      if(isgraph(line[i])){
-        sscanf(line+i,"%d",&k);
+    for (i = 0; i < n; ++i)
+      if (isgraph(line[i])) {
+        sscanf(line + i, "%d", &k);
         putchar('1');
-        for(j=1; j<k; ++j) putchar('0');}
-    putchar('\n');}
-  return(0);
+        for (j = 1; j < k; ++j)
+          putchar('0');
+      }
+    putchar('\n');
+  }
+  return (0);
 }

@@ -1,7 +1,7 @@
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
 #include <math.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 /*
  *                            COPYRIGHT
@@ -38,17 +38,16 @@
 
 /* Compile: gcc -lm -o cfcv cfcv.c */
 
-int main( int argc, char *argv[] )
+int main(int argc, char *argv[])
 {
-  if(argc < 2)
-    {
-      printf("usage: %s a0 a1 a2 ... an\n", argv[0]);
-      printf("  Calculates a continued fraction convergent\n");
-      printf("  ai = simple continued fraction term\n");
-      exit(-1);
-    }
+  if (argc < 2) {
+    printf("usage: %s a0 a1 a2 ... an\n", argv[0]);
+    printf("  Calculates a continued fraction convergent\n");
+    printf("  ai = simple continued fraction term\n");
+    exit(-1);
+  }
 
-  unsigned int i, nterm = argc-1;
+  unsigned int i, nterm = argc - 1;
   unsigned long a, p0, p1, p2, q0, q1, q2;
 
   p0 = 0;
@@ -56,17 +55,16 @@ int main( int argc, char *argv[] )
   q0 = 1;
   q1 = 0;
 
-  for(i=0; i<nterm; ++i)
-    {
-      a = strtoul(argv[i+1],NULL,10);
-      p2 = a*p1 + p0;
-      q2 = a*q1 + q0;
-      p0 = p1;
-      p1 = p2;
-      q0 = q1;
-      q1 = q2;
-    }
+  for (i = 0; i < nterm; ++i) {
+    a = strtoul(argv[i + 1], NULL, 10);
+    p2 = a * p1 + p0;
+    q2 = a * q1 + q0;
+    p0 = p1;
+    p1 = p2;
+    q0 = q1;
+    q1 = q2;
+  }
 
   printf("%d %d\n", p2, q2);
-  return(0);
+  return (0);
 }

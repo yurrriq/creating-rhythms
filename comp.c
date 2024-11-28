@@ -1,7 +1,7 @@
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
 #include <math.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 /*
  *                            COPYRIGHT
@@ -42,31 +42,32 @@ int *parts;
 
 void compose(int n, int p, int m)
 {
-  if( n==0 ){
-    for(; n<m; ++n) printf("%d ",parts[n]);
+  if (n == 0) {
+    for (; n < m; ++n)
+      printf("%d ", parts[n]);
     printf("%d\n", p);
-    return;}
+    return;
+  }
 
-  parts[m]=p;
-  compose(n-1,1,m+1);
-  compose(n-1,p+1,m);
+  parts[m] = p;
+  compose(n - 1, 1, m + 1);
+  compose(n - 1, p + 1, m);
 }
 
 /*******************************************************************/
 
-int main( int argc, char *argv[] )
+int main(int argc, char *argv[])
 {
-  if( argc < 2 )
-    {
-      printf("usage: %s n\n", argv[0]);
-      printf("  Generates all compositions of n.\n");
-      exit( -1 );
-    }
+  if (argc < 2) {
+    printf("usage: %s n\n", argv[0]);
+    printf("  Generates all compositions of n.\n");
+    exit(-1);
+  }
 
   int n = atoi(argv[1]);
-  parts = (int *)malloc(n*sizeof(int));
+  parts = (int *)malloc(n * sizeof(int));
 
-  compose(n-1,1,0);
+  compose(n - 1, 1, 0);
   free(parts);
-  return(0);
+  return (0);
 }

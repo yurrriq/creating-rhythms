@@ -1,7 +1,7 @@
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
 #include <math.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 /*
  *                            COPYRIGHT
@@ -40,49 +40,57 @@
 
 int *parts;
 int *aparts; // allowed parts
-int nap; // number of allowed parts
+int nap;     // number of allowed parts
 
 int allowed(int p)
 {
   int i;
-  for(i=0; i<nap; ++i)
-    if(p == aparts[i]) return(1);
-  return(0);
+  for (i = 0; i < nap; ++i)
+    if (p == aparts[i])
+      return (1);
+  return (0);
 }
 
 void partition(int n, int p, int m)
 {
-  if( n==0 ){
-    if(allowed(p)){
-      for(; n<m; ++n) printf("%d ",parts[n]);
-      printf("%d\n", p);}
-    return;}
+  if (n == 0) {
+    if (allowed(p)) {
+      for (; n < m; ++n)
+        printf("%d ", parts[n]);
+      printf("%d\n", p);
+    }
+    return;
+  }
 
-  if( n<0 ) return;
+  if (n < 0)
+    return;
 
-  if(allowed(p)){ parts[m]=p; partition(n-p,p,m+1); }
-  partition(n-1,p+1,m);
+  if (allowed(p)) {
+    parts[m] = p;
+    partition(n - p, p, m + 1);
+  }
+  partition(n - 1, p + 1, m);
 }
 
 /*******************************************************************/
 
-int main( int argc, char *argv[] )
+int main(int argc, char *argv[])
 {
-  if( argc < 3 )
-    {
-      printf("usage: %s n p1 p2 ...n\n", argv[0]);
-      printf("  Generates all partitions of n with allowed parts pi.\n");
-      exit( -1 );
-    }
+  if (argc < 3) {
+    printf("usage: %s n p1 p2 ...n\n", argv[0]);
+    printf("  Generates all partitions of n with allowed parts pi.\n");
+    exit(-1);
+  }
 
   int i, n = atoi(argv[1]);
-  parts = (int *)malloc(n*sizeof(int));
+  parts = (int *)malloc(n * sizeof(int));
   nap = argc - 2;
-  aparts = (int *)malloc(nap*sizeof(int));
-  for(i=0; i<nap; ++i) aparts[i] = atoi(argv[2+i]);
+  aparts = (int *)malloc(nap * sizeof(int));
+  for (i = 0; i < nap; ++i)
+    aparts[i] = atoi(argv[2 + i]);
 
-  partition(n-1,1,0);
+  partition(n - 1, 1, 0);
   free(parts);
   free(aparts);
-  return(0);
+  return (0);
 }

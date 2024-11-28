@@ -1,7 +1,7 @@
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
 #include <math.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 /*
  *                            COPYRIGHT
@@ -43,34 +43,40 @@ int mp;
 
 void partition(int n, int p, int m)
 {
-  if( n==0 ){
-    if(m == mp){
-      for(; n<m; ++n) printf("%d ",parts[n]);
-      printf("%d\n", p);}
-    return;}
+  if (n == 0) {
+    if (m == mp) {
+      for (; n < m; ++n)
+        printf("%d ", parts[n]);
+      printf("%d\n", p);
+    }
+    return;
+  }
 
-  if( n<0 ) return;
+  if (n < 0)
+    return;
 
-  if(m < mp){ parts[m]=p; partition(n-p,p,m+1); }
-  partition(n-1,p+1,m);
+  if (m < mp) {
+    parts[m] = p;
+    partition(n - p, p, m + 1);
+  }
+  partition(n - 1, p + 1, m);
 }
 
 /*******************************************************************/
 
-int main( int argc, char *argv[] )
+int main(int argc, char *argv[])
 {
-  if( argc < 3 )
-    {
-      printf("usage: %s n m\n", argv[0]);
-      printf("  Generates all partitions of n into m parts.\n");
-      exit( -1 );
-    }
+  if (argc < 3) {
+    printf("usage: %s n m\n", argv[0]);
+    printf("  Generates all partitions of n into m parts.\n");
+    exit(-1);
+  }
 
   int n = atoi(argv[1]);
-  parts = (int *)malloc(n*sizeof(int));
-  mp = atoi(argv[2])-1;
+  parts = (int *)malloc(n * sizeof(int));
+  mp = atoi(argv[2]) - 1;
 
-  partition(n-1,1,0);
+  partition(n - 1, 1, 0);
   free(parts);
-  return(0);
+  return (0);
 }

@@ -1,7 +1,7 @@
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
 #include <math.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 /*
  *                            COPYRIGHT
@@ -40,49 +40,57 @@
 
 int *parts;
 int *aparts; // allowed parts
-int nap; // number of allowed parts
+int nap;     // number of allowed parts
 int mp;
 
 int allowed(int p)
 {
   int i;
-  for(i=0; i<nap; ++i)
-    if(p == aparts[i]) return(1);
-  return(0);
+  for (i = 0; i < nap; ++i)
+    if (p == aparts[i])
+      return (1);
+  return (0);
 }
 
 void compose(int n, int p, int m)
 {
-  if( n==0 ){
-    if(m == mp && allowed(p)){
-      for(; n<m; ++n) printf("%d ",parts[n]);
-      printf("%d\n", p);}
-    return;}
+  if (n == 0) {
+    if (m == mp && allowed(p)) {
+      for (; n < m; ++n)
+        printf("%d ", parts[n]);
+      printf("%d\n", p);
+    }
+    return;
+  }
 
-  if(m < mp && allowed(p)){ parts[m]=p; compose(n-1,1,m+1); }
-  compose(n-1,p+1,m);
+  if (m < mp && allowed(p)) {
+    parts[m] = p;
+    compose(n - 1, 1, m + 1);
+  }
+  compose(n - 1, p + 1, m);
 }
 
 /*******************************************************************/
 
-int main( int argc, char *argv[] )
+int main(int argc, char *argv[])
 {
-  if( argc < 4 )
-    {
-      printf("usage: %s n m p1 p2 ...\n", argv[0]);
-      printf("  Generates compositions of n with m parts from the set (p1 p2 ...)\n");
-      exit( -1 );
-    }
+  if (argc < 4) {
+    printf("usage: %s n m p1 p2 ...\n", argv[0]);
+    printf("  Generates compositions of n with m parts from the set (p1 p2 "
+           "...)\n");
+    exit(-1);
+  }
 
   int i, n = atoi(argv[1]);
-  parts = (int *)malloc(n*sizeof(int));
-  mp = atoi(argv[2])-1;
+  parts = (int *)malloc(n * sizeof(int));
+  mp = atoi(argv[2]) - 1;
   nap = argc - 3;
-  aparts = (int *)malloc(nap*sizeof(int));
-  for(i=0; i<nap; ++i) aparts[i] = atoi(argv[3+i]);
+  aparts = (int *)malloc(nap * sizeof(int));
+  for (i = 0; i < nap; ++i)
+    aparts[i] = atoi(argv[3 + i]);
 
-  compose(n-1,1,0);
+  compose(n - 1, 1, 0);
   free(parts);
   free(aparts);
-  return(0);
+  return (0);
 }

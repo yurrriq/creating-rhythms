@@ -1,7 +1,7 @@
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
 #include <math.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 /*
  *                            COPYRIGHT
@@ -48,44 +48,46 @@ char *dbs;
 
 void neckbin(int k, int l)
 {
-  if(k > n){
-    if((n%l)==0){
-      for(k=0; k<l; ++k) dbs[idbs+k] = b[k+1]==0 ? '0' : '1';
-      idbs += l;}}
-  else{
-    b[k]=b[k-l];
-    if(b[k]==1){
-      neckbin(k+1,l);
-      b[k]=0;
-      neckbin(k+1,k);}
-    else
-      neckbin(k+1,l);}
+  if (k > n) {
+    if ((n % l) == 0) {
+      for (k = 0; k < l; ++k)
+        dbs[idbs + k] = b[k + 1] == 0 ? '0' : '1';
+      idbs += l;
+    }
+  } else {
+    b[k] = b[k - l];
+    if (b[k] == 1) {
+      neckbin(k + 1, l);
+      b[k] = 0;
+      neckbin(k + 1, k);
+    } else
+      neckbin(k + 1, l);
+  }
 }
 
 /*******************************************************************/
 
-int main( int argc, char *argv[] )
+int main(int argc, char *argv[])
 {
-  if(argc < 2)
-    {
-      printf("usage: %s n\n", argv[0]);
-      printf("  Generates the largest de Bruijn sequence of order n.\n");
-      exit(-1);
-    }
+  if (argc < 2) {
+    printf("usage: %s n\n", argv[0]);
+    printf("  Generates the largest de Bruijn sequence of order n.\n");
+    exit(-1);
+  }
 
   n = atoi(argv[1]);
   ndbs = 1 << n;
   idbs = 0;
 
-  b = (int *)malloc((n+2)*sizeof(int));
+  b = (int *)malloc((n + 2) * sizeof(int));
   b[0] = 1;
-  dbs = (char *)malloc((ndbs+1)*sizeof(char));
+  dbs = (char *)malloc((ndbs + 1) * sizeof(char));
 
-  neckbin(1,1);
-  dbs[ndbs]='\0';
+  neckbin(1, 1);
+  dbs[ndbs] = '\0';
   printf("%s\n", dbs);
 
   free(b);
   free(dbs);
-  return(0);
+  return (0);
 }
