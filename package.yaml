@@ -15,7 +15,8 @@ library:
   ghc-options:
     - -fwarn-incomplete-patterns
   source-dirs: src
-  dependencies: []
+  dependencies:
+    - extra
 # executable:
 #   source-dirs: app
 #   main: Main
