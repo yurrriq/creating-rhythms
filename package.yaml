@@ -17,6 +17,7 @@ library:
   source-dirs: src
   dependencies:
     - extra
+    - random
 # executable:
 #   source-dirs: app
 #   main: Main
