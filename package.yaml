@@ -18,6 +18,7 @@ library:
   dependencies:
     - extra
     - random
+    - recursion-schemes
 # executable:
 #   source-dirs: app
 #   main: Main
