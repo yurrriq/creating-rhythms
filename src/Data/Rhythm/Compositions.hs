@@ -1,8 +1,15 @@
 module Data.Rhythm.Compositions where
 
 import Data.Bool (bool)
-import Math.Combinat.Compositions (Composition)
+import Math.Combinat.Compositions (Composition, compositions1)
 import System.Random (randomIO)
+
+-- | All positive compositions of a given number.
+--
+-- >>> compositions 4
+-- [[4],[1,3],[2,2],[3,1],[1,1,2],[1,2,1],[2,1,1],[1,1,1,1]]
+compositions :: (Integral a) => a -> [Composition]
+compositions n = concatMap (`compositions1` n) [1 .. n]
 
 -- | Generate a random positive composition of a given number.
 --
