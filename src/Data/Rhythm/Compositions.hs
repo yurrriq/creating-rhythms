@@ -11,6 +11,13 @@ import System.Random (randomIO)
 compositions :: (Integral a) => a -> [Composition]
 compositions n = concatMap (`compositions1` n) [1 .. n]
 
+-- | All positive compositions with allowed parts.
+--
+-- >>> compositionsAllowed [1,2] 4
+-- [[2,2],[1,1,2],[1,2,1],[2,1,1],[1,1,1,1]]
+compositionsAllowed :: (Integral a) => [Int] -> a -> [Composition]
+compositionsAllowed allowed = filter (all (`elem` allowed)) . compositions
+
 -- | Generate a random positive composition of a given number.
 --
 -- >>> sum <$> randomComposition 13
