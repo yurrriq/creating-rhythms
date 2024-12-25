@@ -18,6 +18,13 @@ compositions n = concatMap (`compositions1` n) [1 .. n]
 compositionsAllowed :: (Integral a) => [Int] -> a -> [Composition]
 compositionsAllowed allowed = filter (all (`elem` allowed)) . compositions
 
+-- | Positive compositions of a given length.
+--
+-- >>> compositionsLength 2 5
+-- [[1,4],[2,3],[3,2],[4,1]]
+compositionsLength :: (Integral a) => a -> a -> [Composition]
+compositionsLength = compositions1
+
 -- | Generate a random positive composition of a given number.
 --
 -- >>> sum <$> randomComposition 13
