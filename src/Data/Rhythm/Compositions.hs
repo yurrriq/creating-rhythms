@@ -1,13 +1,14 @@
 module Data.Rhythm.Compositions where
 
 import Data.Bool (bool)
+import Math.Combinat.Compositions (Composition)
 import System.Random (randomIO)
 
--- | Generate a random composition of a given 'Int'.
+-- | Generate a random positive composition of a given number.
 --
 -- >>> sum <$> randomComposition 13
 -- 13
-randomComposition :: Int -> IO [Int]
+randomComposition :: Int -> IO Composition
 randomComposition n = go 1 (1, [])
   where
     go i (p, acc)
