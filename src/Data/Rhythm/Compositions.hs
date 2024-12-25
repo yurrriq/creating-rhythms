@@ -43,3 +43,14 @@ randomComposition n = go 1 (1, [])
     go i (p, acc)
       | i == n = pure (p : acc)
       | otherwise = go (i + 1) . bool (1, p : acc) (p + 1, acc) =<< randomIO
+
+-- | Generate a random positive composition of a given length.
+--
+-- >>> sum <$> randomCompositionLength 3 33
+-- 33
+randomCompositionLength :: Int -> Int -> IO Composition
+randomCompositionLength len n = go (n - 1) (len - 1, 1, [])
+  where
+    go np (mp, j, acc)
+      | mp > 0 = go (np - 1) . bool (mp - 1, 1, j : acc) (mp, j + 1, acc) =<< randomIO
+      | otherwise = pure (j + np : acc)
