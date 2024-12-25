@@ -25,6 +25,14 @@ compositionsAllowed allowed = filter (all (`elem` allowed)) . compositions
 compositionsLength :: (Integral a) => a -> a -> [Composition]
 compositionsLength = compositions1
 
+-- | Positive compositions of a given length with allowed parts.
+--
+-- >>> compositionsLengthAllowed 2 [1,2,3] 4
+-- [[1,3],[2,2],[3,1]]
+compositionsLengthAllowed :: Int -> [Int] -> Int -> [Composition]
+compositionsLengthAllowed len allowed =
+  filter (all (`elem` allowed)) . compositionsLength len
+
 -- | Generate a random positive composition of a given number.
 --
 -- >>> sum <$> randomComposition 13
