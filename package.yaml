@@ -17,6 +17,7 @@ library:
   source-dirs: src
   dependencies:
     - combinat
+    - containers
     - extra
     - random
     - recursion-schemes
