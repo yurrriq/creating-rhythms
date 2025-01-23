@@ -19,6 +19,7 @@ library:
     - combinat
     - containers
     - extra
+    - fast-digits
     - random
     - recursion-schemes
 # executable:
