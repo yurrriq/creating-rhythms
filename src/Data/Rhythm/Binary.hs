@@ -2,7 +2,7 @@
 
 module Data.Rhythm.Binary where
 
-import Data.Bits (Bits (complementBit, rotateL))
+import Data.Bits (Bits (complementBit, rotateL, shiftL))
 import Data.FastDigits (digits)
 import Data.List (sortOn)
 import Data.List.Extra (splitOn)
@@ -42,30 +42,24 @@ necklacesRSW :: (Integral a, Bits a) => Int -> [a]
 necklacesRSW 0 = [0]
 necklacesRSW n = 0 : search 1
   where
+    -- rotation
+    σ necklace = rotateL necklace 1 `mod` m
+    σᵏ = take n . iterate σ
+
+    -- negate least significant bit
+    τ = flip complementBit 0
+
+    -- Find n-ary binary necklaces
     search necklace
       | necklace == m = [necklace]
       | otherwise = necklace : concatMap search candidates
       where
-        candidates = takeWhile (isNecklace n m) (map τ (tail (σᵏ n m necklace)))
-    m = 2 ^ n - 1
+        candidates = takeWhile isNecklace (map τ (tail (σᵏ necklace)))
 
--- | Determine whether a given number represents a necklace of length @n@.
--- N.B. @m = 2 ^ n - 1@ for optimization purposes.
-isNecklace :: (Integral a, Bits a) => Int -> a -> a -> Bool
-isNecklace n m necklace =
-  necklace == m
-    || all (necklace <=) (σᵏ n m necklace)
+    -- a necklace is the lexicographically smallest rotation
+    isNecklace necklace =
+      necklace == m
+        || all (necklace <=) (σᵏ necklace)
 
--- | All rotations of a given binary necklace of length.
--- N.B. @m = 2 ^ n - 1@ for optimization purposes.
-σᵏ :: (Integral a, Bits a) => Int -> a -> a -> [a]
-σᵏ n m = take n . iterate (σ m)
-
--- | Rotate a given binary necklace left one bit.
--- N.B. @m = 2 ^ n - 1@ for optimization purposes.
-σ :: (Integral a, Bits a) => a -> a -> a
-σ m necklace = rotateL necklace 1 `mod` m
-
--- | Flip the least significant bit of a binary necklace.
-τ :: (Bits a) => a -> a
-τ = flip complementBit 0
+    -- 1ⁿ
+    m = shiftL 1 n - 1
