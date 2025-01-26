@@ -44,7 +44,7 @@ necklacesRSW n = 0 : search 1
   where
     -- rotation
     σ necklace = rotateL necklace 1 `mod` m
-    σᵏ = take n . iterate σ
+    σʲ = take n . iterate σ
 
     -- negate least significant bit
     τ = flip complementBit 0
@@ -54,12 +54,12 @@ necklacesRSW n = 0 : search 1
       | necklace == m = [necklace]
       | otherwise = necklace : concatMap search candidates
       where
-        candidates = takeWhile isNecklace (map τ (tail (σᵏ necklace)))
+        candidates = takeWhile isNecklace (map τ (tail (σʲ necklace)))
 
     -- a necklace is the lexicographically smallest rotation
     isNecklace necklace =
       necklace == m
-        || all (necklace <=) (σᵏ necklace)
+        || all (necklace <=) (σʲ necklace)
 
     -- 1ⁿ
     m = shiftL 1 n - 1
