@@ -22,9 +22,11 @@ library:
     - fast-digits
     - random
     - recursion-schemes
-# executable:
-#   source-dirs: app
-#   main: Main
-#   ghc-options:
-#     - -threaded
-#   dependencies: []
+benchmarks:
+  bench:
+    ghc-options: -threaded -with-rtsopts=-N -O2
+    main: Benchmark.hs
+    source-dirs: bench
+    dependencies:
+      - CreatingRhythms
+      - criterion
