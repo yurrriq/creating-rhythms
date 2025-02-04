@@ -30,3 +30,26 @@ benchmarks:
     dependencies:
       - CreatingRhythms
       - criterion
+.executable: &executable
+  dependencies:
+    - CreatingRhythms
+    - optparse-applicative
+  ghc-prof-options:
+    - -fprof-auto
+    - -rtsopts
+  source-dirs: app
+executables:
+  neck:
+    <<: *executable
+    main: neck/Main.hs
+tests:
+  unit:
+    build-tools:
+      - tasty-discover
+    dependencies:
+      - CreatingRhythms
+      - tasty
+      - tasty-discover
+      - tasty-hunit
+    main: Main.hs
+    source-dirs: test

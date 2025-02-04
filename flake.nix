@@ -49,7 +49,7 @@
         "x86_64-linux"
       ];
 
-      perSystem = { config, lib, pkgs, system, ... }: {
+      perSystem = { config, lib, pkgs, system, self', ... }: {
         _module.args.pkgs = import nixpkgs {
           overlays = [
             inputs.emacs-overlay.overlay
@@ -96,6 +96,15 @@
             nixd
             rust-analyzer-nightly
           ];
+        };
+
+        packages = {
+          creating-rhythms = pkgs.haskellPackages.callCabal2nix
+            "creating-rhythms"
+            (pkgs.nix-gitignore.gitignoreSource [ ] ./.)
+            { };
+
+          default = self'.packages.creating-rhythms;
         };
 
         pre-commit.settings.hooks = {

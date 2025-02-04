@@ -1,6 +1,7 @@
 import Criterion.Main (bench, bgroup, defaultMain, whnf)
 import Data.Functor ((<&>))
-import Data.Rhythm.Binary (necklaces, necklaces')
+import qualified Data.Rhythm.Binary.BurrowsWheeler as BW
+import qualified Data.Rhythm.Binary.RuskeySavageWang as RSW
 import Text.Printf (printf)
 
 main :: IO ()
@@ -9,6 +10,6 @@ main =
     [5, 10, 15] <&> \n ->
       bgroup
         (printf "Binary necklaces of length %d" n)
-        [ bench "RSW" $ whnf necklaces n,
-          bench "Burrows-Wheeler" $ whnf necklaces' n
+        [ bench "RSW" $ whnf RSW.necklaces n,
+          bench "Burrows-Wheeler" $ whnf BW.necklaces n
         ]
