@@ -59,14 +59,14 @@ necklacesRSW n = Node 0 [unfoldTree search 1]
   where
     -- rotation
     σ necklace = rotateL necklace 1 `mod` m
-    σʲ = take n . iterate σ
+    σʲ = take (n - 1) . tail . iterate σ
 
     τ = flip complementBit 0
 
     -- build the tree of find n-ary binary necklaces with a given root
     search necklace
       | necklace == m = (necklace, [])
-      | otherwise = (necklace, takeWhile isNecklace (map τ (tail (σʲ necklace))))
+      | otherwise = (necklace, takeWhile isNecklace (map τ (σʲ necklace)))
 
     -- a necklace is the lexicographically smallest rotation
     isNecklace necklace =
