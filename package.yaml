@@ -42,6 +42,9 @@ executables:
   b2int:
     <<: *executable
     main: b2int/Main.hs
+  cfcv:
+    <<: *executable
+    main: cfcv/Main.hs
   int2b:
     <<: *executable
     main: int2b/Main.hs
