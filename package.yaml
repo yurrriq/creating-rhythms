@@ -39,6 +39,9 @@ benchmarks:
     - -rtsopts
   source-dirs: app
 executables:
+  b2int:
+    <<: *executable
+    main: b2int/Main.hs
   neck:
     <<: *executable
     main: neck/Main.hs
