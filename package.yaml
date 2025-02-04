@@ -42,6 +42,9 @@ executables:
   b2int:
     <<: *executable
     main: b2int/Main.hs
+  int2b:
+    <<: *executable
+    main: int2b/Main.hs
   neck:
     <<: *executable
     main: neck/Main.hs
