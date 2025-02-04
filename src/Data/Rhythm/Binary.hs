@@ -78,8 +78,9 @@ necklacesRSW n = Node 0 [unfoldTree search 1]
 
 necklaces' :: Int -> [[Int]]
 necklaces' n =
-  map (reverse . take n . cycle) $
-    lyndonWords [0, 1] n
+  sortOn Down $
+    map (reverse . take n . cycle) $
+      lyndonWords [0, 1] n
 
 -- Modified from
 -- https://rosettacode.org/wiki/De_Bruijn_sequences#Permutation-based
