@@ -51,6 +51,9 @@ executables:
   compa:
     <<: *executable
     main: compa/Main.hs
+  compm:
+    <<: *executable
+    main: compm/Main.hs
   int2b:
     <<: *executable
     main: int2b/Main.hs
