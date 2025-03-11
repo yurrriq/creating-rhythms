@@ -83,6 +83,13 @@ executables:
       - CreatingRhythms
       - combinat
       - optparse-applicative
+  partam:
+    <<: *executable
+    main: partam/Main.hs
+    dependencies:
+      - CreatingRhythms
+      - combinat
+      - optparse-applicative
   partm:
     <<: *executable
     main: partm/Main.hs

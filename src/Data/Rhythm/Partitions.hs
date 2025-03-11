@@ -28,7 +28,7 @@ partitionsAllowed allowed n =
 partitionsLength :: Int -> Int -> [Partition]
 partitionsLength = partitionsWithKParts
 
--- | foo bar baz
+-- | Partitions of a given length with allowed parts.
 --
 -- >>> partitionsLengthAllowed 2 [1,2,3] 4
 -- [Partition [2,2],Partition [3,1]]
