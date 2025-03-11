@@ -6,12 +6,15 @@ module Data.Rhythm.Partitions
   )
 where
 
-import Math.Combinat.Partitions
-  ( Partition,
-    fromPartition,
-    partitions,
-    partitionsWithKParts,
-  )
+import Math.Combinat.Partitions (Partition, fromPartition, partitionsWithKParts)
+import qualified Math.Combinat.Partitions as Partitions
+
+-- | Partitions of a given number.
+--
+-- >>> partitions 3
+-- [Partition [1,1,1],Partition [2,1],Partition [3]]
+partitions :: Int -> [Partition]
+partitions = Partitions.partitions
 
 -- | Partitions with allowed parts.
 --
