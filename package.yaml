@@ -45,6 +45,9 @@ executables:
   cfcv:
     <<: *executable
     main: cfcv/Main.hs
+  cfsqrt:
+    <<: *executable
+    main: cfsqrt/Main.hs
   comp:
     <<: *executable
     main: comp/Main.hs
