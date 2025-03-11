@@ -1,0 +1,193 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-pragma">{-# LANGUAGE BangPatterns #-}</span><span>
+</span><span id="line-2"></span><span class="hs-pragma">{-# LANGUAGE UnicodeSyntax #-}</span><span>
+</span><span id="line-3"></span><span>
+</span><span id="line-4"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Data.Rhythm.Binary.RuskeySavageWang</span><span>
+</span><span id="line-5"></span><span>  </span><span class="hs-special">(</span><span> </span><span class="annot"><a href="Data.Rhythm.Binary.RuskeySavageWang.html#necklaces"><span class="hs-identifier">necklaces</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-6"></span><span>    </span><span class="annot"><a href="Data.Rhythm.Binary.RuskeySavageWang.html#necklaces%27"><span class="hs-identifier">necklaces'</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-7"></span><span>  </span><span class="hs-special">)</span><span>
+</span><span id="line-8"></span><span class="hs-keyword">where</span><span>
+</span><span id="line-9"></span><span>
+</span><span id="line-10"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Bits</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Bits</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">complementBit</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">rotateL</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">shiftL</span></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-11"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="file:///home/yurrriq/.cabal/store/ghc-9.6.6/fast-digits-0.3.2.0-1dac2bc1304f0af44844a052da4071e59359a49e23d71258e7cc28f763815579/share/doc/html/src/Data.FastDigits.html"><span class="hs-identifier">Data.FastDigits</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="file:///home/yurrriq/.cabal/store/ghc-9.6.6/fast-digits-0.3.2.0-1dac2bc1304f0af44844a052da4071e59359a49e23d71258e7cc28f763815579/share/doc/html/src/Data.FastDigits.html#digits"><span class="hs-identifier">digits</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-12"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.List</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">sortOn</span></span><span class="hs-special">)</span><span>
+</span><span id="line-13"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Data.List.NonEmpty</span></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">NE</span></span><span>
+</span><span id="line-14"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Ord</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Down</span></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-15"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Tree</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Tree</span></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">flatten</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">unfoldTree</span></span><span class="hs-special">)</span><span>
+</span><span id="line-16"></span><span>
+</span><span id="line-17"></span><span class="hs-comment">-- | All binary necklaces of a given length.</span><span>
+</span><span id="line-18"></span><span class="hs-comment">--</span><span>
+</span><span id="line-19"></span><span class="hs-comment">-- &gt;&gt;&gt; necklaces 4</span><span>
+</span><span id="line-20"></span><span class="hs-comment">-- [[1,1,1,1],[1,1,1,0],[1,1,0,0],[1,0,1,0],[1,0,0,0],[0,0,0,0]]</span><span>
+</span><span id="line-21"></span><span class="annot"><a href="Data.Rhythm.Binary.RuskeySavageWang.html#necklaces"><span class="hs-identifier hs-type">necklaces</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">[</span><span class="hs-special">[</span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span class="hs-special">]</span><span class="hs-special">]</span><span>
+</span><span id="line-22"></span><span id="necklaces"><span class="annot"><span class="annottext">necklaces :: Int -&gt; [[Int]]
+</span><a href="Data.Rhythm.Binary.RuskeySavageWang.html#necklaces"><span class="hs-identifier hs-var hs-var">necklaces</span></a></span></span><span> </span><span class="hs-glyph">!</span><span id="local-6989586621679059071"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679059071"><span class="hs-identifier hs-var">n</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-23"></span><span>  </span><span class="annot"><span class="annottext">([Int] -&gt; Down [Int]) -&gt; [[Int]] -&gt; [[Int]]
+forall b a. Ord b =&gt; (a -&gt; b) -&gt; [a] -&gt; [a]
+</span><span class="hs-identifier hs-var">sortOn</span></span><span> </span><span class="annot"><span class="annottext">[Int] -&gt; Down [Int]
+forall a. a -&gt; Down a
+</span><span class="hs-identifier hs-var">Down</span></span><span> </span><span class="annot"><span class="annottext">([[Int]] -&gt; [[Int]]) -&gt; [[Int]] -&gt; [[Int]]
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span>
+</span><span id="line-24"></span><span>    </span><span class="annot"><span class="annottext">(Integer -&gt; [Int]) -&gt; [Integer] -&gt; [[Int]]
+forall a b. (a -&gt; b) -&gt; [a] -&gt; [b]
+</span><span class="hs-identifier hs-var">map</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int -&gt; [Int] -&gt; [Int]
+</span><a href="Data.Rhythm.Binary.RuskeySavageWang.html#padUpTo"><span class="hs-identifier hs-var">padUpTo</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679059071"><span class="hs-identifier hs-var">n</span></a></span><span> </span><span class="annot"><span class="annottext">([Int] -&gt; [Int]) -&gt; (Integer -&gt; [Int]) -&gt; Integer -&gt; [Int]
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Integer -&gt; [Int]
+</span><a href="file:///home/yurrriq/.cabal/store/ghc-9.6.6/fast-digits-0.3.2.0-1dac2bc1304f0af44844a052da4071e59359a49e23d71258e7cc28f763815579/share/doc/html/src/Data.FastDigits.html#digits"><span class="hs-identifier hs-var">digits</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">2</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">([Integer] -&gt; [[Int]]) -&gt; [Integer] -&gt; [[Int]]
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span>
+</span><span id="line-25"></span><span>      </span><span class="annot"><span class="annottext">Tree Integer -&gt; [Integer]
+forall a. Tree a -&gt; [a]
+</span><span class="hs-identifier hs-var">flatten</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int -&gt; Tree Integer
+forall a. (Integral a, Bits a) =&gt; Int -&gt; Tree a
+</span><a href="Data.Rhythm.Binary.RuskeySavageWang.html#necklaces%27"><span class="hs-identifier hs-var">necklaces'</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679059071"><span class="hs-identifier hs-var">n</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-26"></span><span>
+</span><span id="line-27"></span><span class="hs-comment">-- | All binary necklaces of a given length, encoded as numbers.</span><span>
+</span><span id="line-28"></span><span class="hs-comment">--</span><span>
+</span><span id="line-29"></span><span class="hs-comment">-- \[</span><span>
+</span><span id="line-30"></span><span class="hs-comment">--   \begin{align*}</span><span>
+</span><span id="line-31"></span><span class="hs-comment">--     \sigma(x_1 ... x_n) &amp;= x_2 ... x_n x_1 \\</span><span>
+</span><span id="line-32"></span><span class="hs-comment">--     \tau(x_1 ... x_{n-1}) &amp;= x_1 ... x_{n-1}\overline{x_n}</span><span>
+</span><span id="line-33"></span><span class="hs-comment">--   \end{align*}</span><span>
+</span><span id="line-34"></span><span class="hs-comment">-- \]</span><span>
+</span><span id="line-35"></span><span class="hs-comment">--</span><span>
+</span><span id="line-36"></span><span class="hs-comment">-- Generate the tree of binary necklaces of length \(n\), starting with</span><span>
+</span><span id="line-37"></span><span class="hs-comment">-- \(x = 0^n\) as root, where children of \(x\) are the necklaces of the form</span><span>
+</span><span id="line-38"></span><span class="hs-comment">-- \(\tau\sigma^j(x)\) for \(1 \le j \le n -1\).</span><span>
+</span><span id="line-39"></span><span class="hs-comment">--</span><span>
+</span><span id="line-40"></span><span class="hs-comment">-- &gt;&gt;&gt; flatten (necklaces' 4)</span><span>
+</span><span id="line-41"></span><span class="hs-comment">-- [0,1,3,7,15,5]</span><span>
+</span><span id="line-42"></span><span id="local-6989586621679059026"><span class="annot"><a href="Data.Rhythm.Binary.RuskeySavageWang.html#necklaces%27"><span class="hs-identifier hs-type">necklaces'</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Integral</span></span><span> </span><span class="annot"><a href="#local-6989586621679059026"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Bits</span></span><span> </span><span class="annot"><a href="#local-6989586621679059026"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Tree</span></span><span> </span><span class="annot"><a href="#local-6989586621679059026"><span class="hs-identifier hs-type">a</span></a></span></span><span>
+</span><span id="line-43"></span><span id="necklaces%27"><span class="annot"><span class="annottext">necklaces' :: forall a. (Integral a, Bits a) =&gt; Int -&gt; Tree a
+</span><a href="Data.Rhythm.Binary.RuskeySavageWang.html#necklaces%27"><span class="hs-identifier hs-var hs-var">necklaces'</span></a></span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">a -&gt; [Tree a] -&gt; Tree a
+forall a. a -&gt; [Tree a] -&gt; Tree a
+</span><span class="hs-identifier hs-var">Node</span></span><span> </span><span class="annot"><span class="annottext">a
+</span><span class="hs-number">0</span></span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span>
+</span><span id="line-44"></span><span class="annot"><a href="Data.Rhythm.Binary.RuskeySavageWang.html#necklaces%27"><span class="hs-identifier hs-var">necklaces'</span></a></span><span> </span><span class="hs-glyph">!</span><span id="local-6989586621679059094"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679059094"><span class="hs-identifier hs-var">n</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">a -&gt; [Tree a] -&gt; Tree a
+forall a. a -&gt; [Tree a] -&gt; Tree a
+</span><span class="hs-identifier hs-var">Node</span></span><span> </span><span class="annot"><span class="annottext">a
+</span><span class="hs-number">0</span></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">(a -&gt; (a, [a])) -&gt; a -&gt; Tree a
+forall b a. (b -&gt; (a, [b])) -&gt; b -&gt; Tree a
+</span><span class="hs-identifier hs-var">unfoldTree</span></span><span> </span><span class="annot"><span class="annottext">a -&gt; (a, [a])
+</span><a href="#local-6989586621679059095"><span class="hs-identifier hs-var">search</span></a></span><span> </span><span class="annot"><span class="annottext">a
+</span><span class="hs-number">1</span></span><span class="hs-special">]</span><span>
+</span><span id="line-45"></span><span>  </span><span class="hs-keyword">where</span><span>
+</span><span id="line-46"></span><span>    </span><span class="hs-comment">-- rotation</span><span>
+</span><span id="line-47"></span><span>    </span><span id="local-6989586621679059104"><span class="annot"><span class="annottext">&#963; :: a -&gt; a
+</span><a href="#local-6989586621679059104"><span class="hs-identifier hs-var hs-var">&#963;</span></a></span></span><span> </span><span id="local-6989586621679059105"><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679059105"><span class="hs-identifier hs-var">necklace</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">a -&gt; Int -&gt; a
+forall a. Bits a =&gt; a -&gt; Int -&gt; a
+</span><span class="hs-identifier hs-var">rotateL</span></span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679059105"><span class="hs-identifier hs-var">necklace</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">1</span></span><span> </span><span class="annot"><span class="annottext">a -&gt; a -&gt; a
+forall a. Integral a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">`mod`</span></span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679059107"><span class="hs-identifier hs-var">m</span></a></span><span>
+</span><span id="line-48"></span><span>    </span><span id="local-6989586621679059110"><span class="annot"><span class="annottext">&#963;&#690; :: a -&gt; [a]
+</span><a href="#local-6989586621679059110"><span class="hs-identifier hs-var hs-var">&#963;&#690;</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; [a] -&gt; [a]
+forall a. Int -&gt; [a] -&gt; [a]
+</span><span class="hs-identifier hs-var">take</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679059094"><span class="hs-identifier hs-var">n</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-glyph hs-var">-</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">1</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">([a] -&gt; [a]) -&gt; (a -&gt; [a]) -&gt; a -&gt; [a]
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">NonEmpty a -&gt; [a]
+forall a. NonEmpty a -&gt; [a]
+</span><span class="hs-identifier hs-var">NE.tail</span></span><span> </span><span class="annot"><span class="annottext">(NonEmpty a -&gt; [a]) -&gt; (a -&gt; NonEmpty a) -&gt; a -&gt; [a]
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">(a -&gt; a) -&gt; a -&gt; NonEmpty a
+forall a. (a -&gt; a) -&gt; a -&gt; NonEmpty a
+</span><span class="hs-identifier hs-var">NE.iterate</span></span><span> </span><span class="annot"><span class="annottext">a -&gt; a
+</span><a href="#local-6989586621679059104"><span class="hs-identifier hs-var">&#963;</span></a></span><span>
+</span><span id="line-49"></span><span>
+</span><span id="line-50"></span><span>    </span><span id="local-6989586621679059117"><span class="annot"><span class="annottext">&#964; :: a -&gt; a
+</span><a href="#local-6989586621679059117"><span class="hs-identifier hs-var hs-var">&#964;</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(a -&gt; Int -&gt; a) -&gt; Int -&gt; a -&gt; a
+forall a b c. (a -&gt; b -&gt; c) -&gt; b -&gt; a -&gt; c
+</span><span class="hs-identifier hs-var">flip</span></span><span> </span><span class="annot"><span class="annottext">a -&gt; Int -&gt; a
+forall a. Bits a =&gt; a -&gt; Int -&gt; a
+</span><span class="hs-identifier hs-var">complementBit</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0</span></span><span>
+</span><span id="line-51"></span><span>
+</span><span id="line-52"></span><span>    </span><span class="hs-comment">-- build the tree of n-ary binary necklaces with a given root</span><span>
+</span><span id="line-53"></span><span>    </span><span id="local-6989586621679059095"><span class="annot"><span class="annottext">search :: a -&gt; (a, [a])
+</span><a href="#local-6989586621679059095"><span class="hs-identifier hs-var hs-var">search</span></a></span></span><span> </span><span class="hs-glyph">!</span><span id="local-6989586621679059120"><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679059120"><span class="hs-identifier hs-var">necklace</span></a></span></span><span>
+</span><span id="line-54"></span><span>      </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679059120"><span class="hs-identifier hs-var">necklace</span></a></span><span> </span><span class="annot"><span class="annottext">a -&gt; a -&gt; Bool
+forall a. Eq a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">==</span></span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679059107"><span class="hs-identifier hs-var">m</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679059120"><span class="hs-identifier hs-var">necklace</span></a></span><span class="hs-special">,</span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span class="hs-special">)</span><span>
+</span><span id="line-55"></span><span>      </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">otherwise</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679059120"><span class="hs-identifier hs-var">necklace</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">(a -&gt; Bool) -&gt; [a] -&gt; [a]
+forall a. (a -&gt; Bool) -&gt; [a] -&gt; [a]
+</span><span class="hs-identifier hs-var">takeWhile</span></span><span> </span><span class="annot"><span class="annottext">a -&gt; Bool
+</span><a href="#local-6989586621679059122"><span class="hs-identifier hs-var">isNecklace</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(a -&gt; a) -&gt; [a] -&gt; [a]
+forall a b. (a -&gt; b) -&gt; [a] -&gt; [b]
+</span><span class="hs-identifier hs-var">map</span></span><span> </span><span class="annot"><span class="annottext">a -&gt; a
+</span><a href="#local-6989586621679059117"><span class="hs-identifier hs-var">&#964;</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">a -&gt; [a]
+</span><a href="#local-6989586621679059110"><span class="hs-identifier hs-var">&#963;&#690;</span></a></span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679059120"><span class="hs-identifier hs-var">necklace</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-56"></span><span>
+</span><span id="line-57"></span><span>    </span><span class="hs-comment">-- a necklace is the lexicographically smallest rotation</span><span>
+</span><span id="line-58"></span><span>    </span><span id="local-6989586621679059122"><span class="annot"><span class="annottext">isNecklace :: a -&gt; Bool
+</span><a href="#local-6989586621679059122"><span class="hs-identifier hs-var hs-var">isNecklace</span></a></span></span><span> </span><span id="local-6989586621679059128"><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679059128"><span class="hs-identifier hs-var">necklace</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-59"></span><span>      </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679059128"><span class="hs-identifier hs-var">necklace</span></a></span><span> </span><span class="annot"><span class="annottext">a -&gt; a -&gt; Bool
+forall a. Eq a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">==</span></span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679059107"><span class="hs-identifier hs-var">m</span></a></span><span>
+</span><span id="line-60"></span><span>        </span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Bool
+</span><span class="hs-operator hs-var">||</span></span><span> </span><span class="annot"><span class="annottext">(a -&gt; Bool) -&gt; [a] -&gt; Bool
+forall (t :: * -&gt; *) a. Foldable t =&gt; (a -&gt; Bool) -&gt; t a -&gt; Bool
+</span><span class="hs-identifier hs-var">all</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679059128"><span class="hs-identifier hs-var">necklace</span></a></span><span> </span><span class="annot"><span class="annottext">a -&gt; a -&gt; Bool
+forall a. Ord a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">&lt;=</span></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">a -&gt; [a]
+</span><a href="#local-6989586621679059110"><span class="hs-identifier hs-var">&#963;&#690;</span></a></span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679059128"><span class="hs-identifier hs-var">necklace</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-61"></span><span>
+</span><span id="line-62"></span><span>    </span><span class="hs-comment">-- 1&#8319;</span><span>
+</span><span id="line-63"></span><span>    </span><span id="local-6989586621679059107"><span class="annot"><span class="annottext">m :: a
+</span><a href="#local-6989586621679059107"><span class="hs-identifier hs-var hs-var">m</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">a -&gt; Int -&gt; a
+forall a. Bits a =&gt; a -&gt; Int -&gt; a
+</span><span class="hs-identifier hs-var">shiftL</span></span><span> </span><span class="annot"><span class="annottext">a
+</span><span class="hs-number">1</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679059094"><span class="hs-identifier hs-var">n</span></a></span><span> </span><span class="annot"><span class="annottext">a -&gt; a -&gt; a
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-glyph hs-var">-</span></span><span> </span><span class="annot"><span class="annottext">a
+</span><span class="hs-number">1</span></span><span>
+</span><span id="line-64"></span><span>
+</span><span id="line-65"></span><span class="hs-comment">-- modified from Data.FastDigits</span><span>
+</span><span id="line-66"></span><span class="annot"><a href="Data.Rhythm.Binary.RuskeySavageWang.html#padUpTo"><span class="hs-identifier hs-type">padUpTo</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">[</span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span class="hs-special">]</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">[</span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span class="hs-special">]</span><span>
+</span><span id="line-67"></span><span id="padUpTo"><span class="annot"><span class="annottext">padUpTo :: Int -&gt; [Int] -&gt; [Int]
+</span><a href="Data.Rhythm.Binary.RuskeySavageWang.html#padUpTo"><span class="hs-identifier hs-var hs-var">padUpTo</span></a></span></span><span> </span><span class="hs-glyph">!</span><span id="local-6989586621679059137"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679059137"><span class="hs-identifier hs-var">n</span></a></span></span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; [Int]
+forall a. Int -&gt; a -&gt; [a]
+</span><span class="hs-identifier hs-var">replicate</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679059137"><span class="hs-identifier hs-var">n</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0</span></span><span>
+</span><span id="line-68"></span><span class="annot"><a href="Data.Rhythm.Binary.RuskeySavageWang.html#padUpTo"><span class="hs-identifier hs-var">padUpTo</span></a></span><span> </span><span class="hs-glyph">!</span><span id="local-6989586621679059139"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679059139"><span class="hs-identifier hs-var">n</span></a></span></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679059140"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679059140"><span class="hs-identifier hs-var">x</span></a></span></span><span> </span><span class="annot"><span class="hs-glyph hs-type">:</span></span><span> </span><span id="local-6989586621679059141"><span class="annot"><span class="annottext">[Int]
+</span><a href="#local-6989586621679059141"><span class="hs-identifier hs-var">xs</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679059140"><span class="hs-identifier hs-var">x</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; [Int] -&gt; [Int]
+forall a. a -&gt; [a] -&gt; [a]
+</span><span class="hs-glyph hs-var">:</span></span><span> </span><span class="annot"><span class="annottext">Int -&gt; [Int] -&gt; [Int]
+</span><a href="Data.Rhythm.Binary.RuskeySavageWang.html#padUpTo"><span class="hs-identifier hs-var">padUpTo</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679059139"><span class="hs-identifier hs-var">n</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-glyph hs-var">-</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">1</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">[Int]
+</span><a href="#local-6989586621679059141"><span class="hs-identifier hs-var">xs</span></a></span><span>
+</span><span id="line-69"></span></pre></body></html>

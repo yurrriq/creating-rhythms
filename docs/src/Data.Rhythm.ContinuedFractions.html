@@ -1,0 +1,299 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-pragma">{-# LANGUAGE TypeApplications #-}</span><span>
+</span><span id="line-2"></span><span>
+</span><span id="line-3"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Data.Rhythm.ContinuedFractions</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-4"></span><span>
+</span><span id="line-5"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Control.Monad</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">guard</span></span><span class="hs-special">)</span><span>
+</span><span id="line-6"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Bifunctor</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">first</span></span><span class="hs-special">)</span><span>
+</span><span id="line-7"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="file:///home/yurrriq/.cabal/store/ghc-9.6.6/recursion-schemes-5.2.3-59d6a8a49972e2a4fa24fb073ee7f23ee68db39cd49c35394d3a2b202dd6f851/share/doc/html/src/Data.Functor.Base.html"><span class="hs-identifier">Data.Functor.Base</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="file:///home/yurrriq/.cabal/store/ghc-9.6.6/recursion-schemes-5.2.3-59d6a8a49972e2a4fa24fb073ee7f23ee68db39cd49c35394d3a2b202dd6f851/share/doc/html/src/Data.Functor.Base.html#NonEmptyF"><span class="hs-identifier">NonEmptyF</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-8"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="file:///home/yurrriq/.cabal/store/ghc-9.6.6/recursion-schemes-5.2.3-59d6a8a49972e2a4fa24fb073ee7f23ee68db39cd49c35394d3a2b202dd6f851/share/doc/html/src/Data.Functor.Foldable.html"><span class="hs-identifier">Data.Functor.Foldable</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="file:///home/yurrriq/.cabal/store/ghc-9.6.6/recursion-schemes-5.2.3-59d6a8a49972e2a4fa24fb073ee7f23ee68db39cd49c35394d3a2b202dd6f851/share/doc/html/src/Data.Functor.Foldable.html#ana"><span class="hs-identifier">ana</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="file:///home/yurrriq/.cabal/store/ghc-9.6.6/recursion-schemes-5.2.3-59d6a8a49972e2a4fa24fb073ee7f23ee68db39cd49c35394d3a2b202dd6f851/share/doc/html/src/Data.Functor.Foldable.html#cata"><span class="hs-identifier">cata</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-9"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.List</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">intercalate</span></span><span class="hs-special">)</span><span>
+</span><span id="line-10"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.List.NonEmpty</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">NonEmpty</span></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-11"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Maybe</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">listToMaybe</span></span><span class="hs-special">)</span><span>
+</span><span id="line-12"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="file:///home/yurrriq/.cabal/store/ghc-9.6.6/extra-1.8-e09eba2a1105d1f1e52cc5ddff8c02a6150c09ebdc78d13517061fbe14707f0c/share/doc/html/src/Data.Tuple.Extra.html"><span class="hs-identifier">Data.Tuple.Extra</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="file:///home/yurrriq/.cabal/store/ghc-9.6.6/extra-1.8-e09eba2a1105d1f1e52cc5ddff8c02a6150c09ebdc78d13517061fbe14707f0c/share/doc/html/src/Data.Tuple.Extra.html#thd3"><span class="hs-identifier">thd3</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-13"></span><span>
+</span><span id="line-14"></span><span class="hs-comment">-- | A 'ContinuedFraction' is a 'NonEmpty', potentially infinite, list of</span><span>
+</span><span id="line-15"></span><span class="hs-comment">-- integer 'coefficients'.</span><span>
+</span><span id="line-16"></span><span class="hs-keyword">newtype</span><span> </span><span id="ContinuedFraction"><span class="annot"><a href="Data.Rhythm.ContinuedFractions.html#ContinuedFraction"><span class="hs-identifier hs-var">ContinuedFraction</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="ContinuedFraction"><span class="annot"><a href="Data.Rhythm.ContinuedFractions.html#ContinuedFraction"><span class="hs-identifier hs-var">ContinuedFraction</span></a></span></span><span>
+</span><span id="line-17"></span><span>  </span><span class="hs-special">{</span><span id="coefficients"><span class="annot"><span class="annottext">ContinuedFraction -&gt; NonEmpty Integer
+</span><a href="Data.Rhythm.ContinuedFractions.html#coefficients"><span class="hs-identifier hs-var hs-var">coefficients</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">NonEmpty</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Integer</span></span><span class="hs-special">}</span><span>
+</span><span id="line-18"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679059449"><span id="local-6989586621679059455"><span class="annot"><span class="annottext">ContinuedFraction -&gt; ContinuedFraction -&gt; Bool
+(ContinuedFraction -&gt; ContinuedFraction -&gt; Bool)
+-&gt; (ContinuedFraction -&gt; ContinuedFraction -&gt; Bool)
+-&gt; Eq ContinuedFraction
+forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
+$c== :: ContinuedFraction -&gt; ContinuedFraction -&gt; Bool
+== :: ContinuedFraction -&gt; ContinuedFraction -&gt; Bool
+$c/= :: ContinuedFraction -&gt; ContinuedFraction -&gt; Bool
+/= :: ContinuedFraction -&gt; ContinuedFraction -&gt; Bool
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679059465"><span id="local-6989586621679059471"><span id="local-6989586621679059476"><span id="local-6989586621679059481"><span id="local-6989586621679059486"><span id="local-6989586621679059491"><span id="local-6989586621679059496"><span class="annot"><span class="annottext">Eq ContinuedFraction
+Eq ContinuedFraction =&gt;
+(ContinuedFraction -&gt; ContinuedFraction -&gt; Ordering)
+-&gt; (ContinuedFraction -&gt; ContinuedFraction -&gt; Bool)
+-&gt; (ContinuedFraction -&gt; ContinuedFraction -&gt; Bool)
+-&gt; (ContinuedFraction -&gt; ContinuedFraction -&gt; Bool)
+-&gt; (ContinuedFraction -&gt; ContinuedFraction -&gt; Bool)
+-&gt; (ContinuedFraction -&gt; ContinuedFraction -&gt; ContinuedFraction)
+-&gt; (ContinuedFraction -&gt; ContinuedFraction -&gt; ContinuedFraction)
+-&gt; Ord ContinuedFraction
+ContinuedFraction -&gt; ContinuedFraction -&gt; Bool
+ContinuedFraction -&gt; ContinuedFraction -&gt; Ordering
+ContinuedFraction -&gt; ContinuedFraction -&gt; ContinuedFraction
+forall a.
+Eq a =&gt;
+(a -&gt; a -&gt; Ordering)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; Ord a
+$ccompare :: ContinuedFraction -&gt; ContinuedFraction -&gt; Ordering
+compare :: ContinuedFraction -&gt; ContinuedFraction -&gt; Ordering
+$c&lt; :: ContinuedFraction -&gt; ContinuedFraction -&gt; Bool
+&lt; :: ContinuedFraction -&gt; ContinuedFraction -&gt; Bool
+$c&lt;= :: ContinuedFraction -&gt; ContinuedFraction -&gt; Bool
+&lt;= :: ContinuedFraction -&gt; ContinuedFraction -&gt; Bool
+$c&gt; :: ContinuedFraction -&gt; ContinuedFraction -&gt; Bool
+&gt; :: ContinuedFraction -&gt; ContinuedFraction -&gt; Bool
+$c&gt;= :: ContinuedFraction -&gt; ContinuedFraction -&gt; Bool
+&gt;= :: ContinuedFraction -&gt; ContinuedFraction -&gt; Bool
+$cmax :: ContinuedFraction -&gt; ContinuedFraction -&gt; ContinuedFraction
+max :: ContinuedFraction -&gt; ContinuedFraction -&gt; ContinuedFraction
+$cmin :: ContinuedFraction -&gt; ContinuedFraction -&gt; ContinuedFraction
+min :: ContinuedFraction -&gt; ContinuedFraction -&gt; ContinuedFraction
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Ord</span></span></span></span></span></span></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-19"></span><span>
+</span><span id="line-20"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679059504"><span id="local-6989586621679059509"><span class="annot"><span class="hs-identifier hs-type">Show</span></span><span> </span><span class="annot"><a href="Data.Rhythm.ContinuedFractions.html#ContinuedFraction"><span class="hs-identifier hs-type">ContinuedFraction</span></a></span></span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-21"></span><span>  </span><span id="local-6989586621679059531"><span class="annot"><span class="annottext">show :: ContinuedFraction -&gt; String
+</span><a href="#local-6989586621679059531"><span class="hs-identifier hs-var hs-var hs-var hs-var">show</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Data.Rhythm.ContinuedFractions.html#ContinuedFraction"><span class="hs-identifier hs-type">ContinuedFraction</span></a></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679059533"><span class="annot"><span class="annottext">Integer
+</span><a href="#local-6989586621679059533"><span class="hs-identifier hs-var">x</span></a></span></span><span> </span><span class="annot"><span class="hs-operator hs-type">:|</span></span><span> </span><span id="local-6989586621679059535"><span class="annot"><span class="annottext">[Integer]
+</span><a href="#local-6989586621679059535"><span class="hs-identifier hs-var">xs</span></a></span></span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-22"></span><span>    </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;[&quot;</span></span><span>
+</span><span id="line-23"></span><span>      </span><span class="annot"><span class="annottext">String -&gt; ShowS
+forall a. Semigroup a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">Integer -&gt; String
+forall a. Show a =&gt; a -&gt; String
+</span><span class="hs-identifier hs-var">show</span></span><span> </span><span class="annot"><span class="annottext">Integer
+</span><a href="#local-6989586621679059533"><span class="hs-identifier hs-var">x</span></a></span><span>
+</span><span id="line-24"></span><span>      </span><span class="annot"><span class="annottext">String -&gt; ShowS
+forall a. Semigroup a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;;&quot;</span></span><span>
+</span><span id="line-25"></span><span>      </span><span class="annot"><span class="annottext">String -&gt; ShowS
+forall a. Semigroup a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; [String] -&gt; String
+forall a. [a] -&gt; [[a]] -&gt; [a]
+</span><span class="hs-identifier hs-var">intercalate</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;,&quot;</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(Integer -&gt; String) -&gt; [Integer] -&gt; [String]
+forall a b. (a -&gt; b) -&gt; [a] -&gt; [b]
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-identifier hs-var">fmap</span></span><span> </span><span class="annot"><span class="annottext">Integer -&gt; String
+forall a. Show a =&gt; a -&gt; String
+</span><span class="hs-identifier hs-var">show</span></span><span> </span><span class="annot"><span class="annottext">[Integer]
+</span><a href="#local-6989586621679059536"><span class="hs-identifier hs-var">ys</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-26"></span><span>      </span><span class="annot"><span class="annottext">String -&gt; ShowS
+forall a. Semigroup a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; (Integer -&gt; String) -&gt; Maybe Integer -&gt; String
+forall b a. b -&gt; (a -&gt; b) -&gt; Maybe a -&gt; b
+</span><span class="hs-identifier hs-var">maybe</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;&quot;</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">String -&gt; Integer -&gt; String
+forall a b. a -&gt; b -&gt; a
+</span><span class="hs-identifier hs-var">const</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;,...&quot;</span></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">[Integer] -&gt; Maybe Integer
+forall a. [a] -&gt; Maybe a
+</span><span class="hs-identifier hs-var">listToMaybe</span></span><span> </span><span class="annot"><span class="annottext">[Integer]
+</span><a href="#local-6989586621679059539"><span class="hs-identifier hs-var">zs</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-27"></span><span>      </span><span class="annot"><span class="annottext">String -&gt; ShowS
+forall a. Semigroup a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;]&quot;</span></span><span>
+</span><span id="line-28"></span><span>    </span><span class="hs-keyword">where</span><span>
+</span><span id="line-29"></span><span>      </span><span class="hs-special">(</span><span id="local-6989586621679059536"><span class="annot"><span class="annottext">[Integer]
+</span><a href="#local-6989586621679059536"><span class="hs-identifier hs-var">ys</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679059539"><span class="annot"><span class="annottext">[Integer]
+</span><a href="#local-6989586621679059539"><span class="hs-identifier hs-var">zs</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; [Integer] -&gt; ([Integer], [Integer])
+forall a. Int -&gt; [a] -&gt; ([a], [a])
+</span><span class="hs-identifier hs-var">splitAt</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">11</span></span><span> </span><span class="annot"><span class="annottext">[Integer]
+</span><a href="#local-6989586621679059535"><span class="hs-identifier hs-var">xs</span></a></span><span>
+</span><span id="line-30"></span><span>
+</span><span id="line-31"></span><span class="annot"><span class="hs-comment">-- | Evaluate a finite 'ContinuedFraction'.</span></span><span>
+</span><span id="line-32"></span><span class="annot"><a href="Data.Rhythm.ContinuedFractions.html#collapseFraction"><span class="hs-identifier hs-type">collapseFraction</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Data.Rhythm.ContinuedFractions.html#ContinuedFraction"><span class="hs-identifier hs-type">ContinuedFraction</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Rational</span></span><span>
+</span><span id="line-33"></span><span id="collapseFraction"><span class="annot"><span class="annottext">collapseFraction :: ContinuedFraction -&gt; Rational
+</span><a href="Data.Rhythm.ContinuedFractions.html#collapseFraction"><span class="hs-identifier hs-var hs-var">collapseFraction</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Base (NonEmpty Integer) Rational -&gt; Rational)
+-&gt; NonEmpty Integer -&gt; Rational
+forall t a. Recursive t =&gt; (Base t a -&gt; a) -&gt; t -&gt; a
+forall a. (Base (NonEmpty Integer) a -&gt; a) -&gt; NonEmpty Integer -&gt; a
+</span><a href="file:///home/yurrriq/.cabal/store/ghc-9.6.6/recursion-schemes-5.2.3-59d6a8a49972e2a4fa24fb073ee7f23ee68db39cd49c35394d3a2b202dd6f851/share/doc/html/src/Data.Functor.Foldable.html#cata"><span class="hs-identifier hs-var">cata</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">NonEmptyF Rational Rational -&gt; Rational
+forall {a}. Fractional a =&gt; NonEmptyF a a -&gt; a
+</span><a href="#local-6989586621679059542"><span class="hs-identifier hs-var">algebra</span></a></span><span> </span><span class="annot"><span class="annottext">(NonEmptyF Rational Rational -&gt; Rational)
+-&gt; (NonEmptyF Integer Rational -&gt; NonEmptyF Rational Rational)
+-&gt; NonEmptyF Integer Rational
+-&gt; Rational
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">(Integer -&gt; Rational)
+-&gt; NonEmptyF Integer Rational -&gt; NonEmptyF Rational Rational
+forall a b c. (a -&gt; b) -&gt; NonEmptyF a c -&gt; NonEmptyF b c
+forall (p :: * -&gt; * -&gt; *) a b c.
+Bifunctor p =&gt;
+(a -&gt; b) -&gt; p a c -&gt; p b c
+</span><span class="hs-identifier hs-var">first</span></span><span> </span><span class="annot"><span class="annottext">Integer -&gt; Rational
+forall a. Real a =&gt; a -&gt; Rational
+</span><span class="hs-identifier hs-var">toRational</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">(NonEmpty Integer -&gt; Rational)
+-&gt; (ContinuedFraction -&gt; NonEmpty Integer)
+-&gt; ContinuedFraction
+-&gt; Rational
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">ContinuedFraction -&gt; NonEmpty Integer
+</span><a href="Data.Rhythm.ContinuedFractions.html#coefficients"><span class="hs-identifier hs-var">coefficients</span></a></span><span>
+</span><span id="line-34"></span><span>  </span><span class="hs-keyword">where</span><span>
+</span><span id="line-35"></span><span>    </span><span id="local-6989586621679059542"><span class="annot"><span class="annottext">algebra :: NonEmptyF a a -&gt; a
+</span><a href="#local-6989586621679059542"><span class="hs-identifier hs-var hs-var">algebra</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="file:///home/yurrriq/.cabal/store/ghc-9.6.6/recursion-schemes-5.2.3-59d6a8a49972e2a4fa24fb073ee7f23ee68db39cd49c35394d3a2b202dd6f851/share/doc/html/src/Data.Functor.Base.html#NonEmptyF"><span class="hs-identifier hs-type">NonEmptyF</span></a></span><span> </span><span id="local-6989586621679059551"><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679059551"><span class="hs-identifier hs-var">i</span></a></span></span><span> </span><span class="annot"><span class="annottext">Maybe a
+</span><span class="hs-identifier hs-var">Nothing</span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679059551"><span class="hs-identifier hs-var">i</span></a></span><span>
+</span><span id="line-36"></span><span>    </span><span class="annot"><a href="#local-6989586621679059542"><span class="hs-identifier hs-var">algebra</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="file:///home/yurrriq/.cabal/store/ghc-9.6.6/recursion-schemes-5.2.3-59d6a8a49972e2a4fa24fb073ee7f23ee68db39cd49c35394d3a2b202dd6f851/share/doc/html/src/Data.Functor.Base.html#NonEmptyF"><span class="hs-identifier hs-type">NonEmptyF</span></a></span><span> </span><span id="local-6989586621679059552"><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679059552"><span class="hs-identifier hs-var">i</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Just</span></span><span> </span><span id="local-6989586621679059553"><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679059553"><span class="hs-identifier hs-var">d</span></a></span></span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679059552"><span class="hs-identifier hs-var">i</span></a></span><span> </span><span class="annot"><span class="annottext">a -&gt; a -&gt; a
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">+</span></span><span> </span><span class="annot"><span class="annottext">a -&gt; a
+forall a. Fractional a =&gt; a -&gt; a
+</span><span class="hs-identifier hs-var">recip</span></span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679059553"><span class="hs-identifier hs-var">d</span></a></span><span>
+</span><span id="line-37"></span><span>
+</span><span id="line-38"></span><span class="hs-comment">-- | Calculate the 'ContinuedFraction' representation of the square root of a</span><span>
+</span><span id="line-39"></span><span class="hs-comment">-- given number.</span><span>
+</span><span id="line-40"></span><span id="local-6989586621679059400"><span class="annot"><a href="Data.Rhythm.ContinuedFractions.html#continuedFractionSqrt"><span class="hs-identifier hs-type">continuedFractionSqrt</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Integral</span></span><span> </span><span class="annot"><a href="#local-6989586621679059400"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679059400"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Data.Rhythm.ContinuedFractions.html#ContinuedFraction"><span class="hs-identifier hs-type">ContinuedFraction</span></a></span></span><span>
+</span><span id="line-41"></span><span id="continuedFractionSqrt"><span class="annot"><span class="annottext">continuedFractionSqrt :: forall a. Integral a =&gt; a -&gt; ContinuedFraction
+</span><a href="Data.Rhythm.ContinuedFractions.html#continuedFractionSqrt"><span class="hs-identifier hs-var hs-var">continuedFractionSqrt</span></a></span></span><span> </span><span id="local-6989586621679059581"><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679059581"><span class="hs-identifier hs-var">n</span></a></span></span><span>
+</span><span id="line-42"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679059582"><span class="hs-identifier hs-var">root</span></a></span><span> </span><span class="annot"><span class="annottext">a -&gt; a -&gt; a
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">*</span></span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679059582"><span class="hs-identifier hs-var">root</span></a></span><span> </span><span class="annot"><span class="annottext">a -&gt; a -&gt; Bool
+forall a. Ord a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">&lt;</span></span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679059581"><span class="hs-identifier hs-var">n</span></a></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-43"></span><span>      </span><span class="annot"><span class="annottext">NonEmpty Integer -&gt; ContinuedFraction
+</span><a href="Data.Rhythm.ContinuedFractions.html#ContinuedFraction"><span class="hs-identifier hs-var">ContinuedFraction</span></a></span><span> </span><span class="annot"><span class="annottext">(NonEmpty Integer -&gt; ContinuedFraction)
+-&gt; NonEmpty Integer -&gt; ContinuedFraction
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">a -&gt; Integer
+forall a b. (Integral a, Num b) =&gt; a -&gt; b
+</span><span class="hs-identifier hs-var">fromIntegral</span></span><span> </span><span class="annot"><span class="annottext">(a -&gt; Integer) -&gt; ((a, a, a) -&gt; a) -&gt; (a, a, a) -&gt; Integer
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">(a, a, a) -&gt; a
+forall a b c. (a, b, c) -&gt; c
+</span><a href="file:///home/yurrriq/.cabal/store/ghc-9.6.6/extra-1.8-e09eba2a1105d1f1e52cc5ddff8c02a6150c09ebdc78d13517061fbe14707f0c/share/doc/html/src/Data.Tuple.Extra.html#thd3"><span class="hs-identifier hs-var">thd3</span></a></span><span> </span><span class="annot"><span class="annottext">((a, a, a) -&gt; Integer) -&gt; NonEmpty (a, a, a) -&gt; NonEmpty Integer
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-operator hs-var">&lt;$&gt;</span></span><span> </span><span class="annot"><span class="annottext">((a, a, a) -&gt; Base (NonEmpty (a, a, a)) (a, a, a))
+-&gt; (a, a, a) -&gt; NonEmpty (a, a, a)
+forall t a. Corecursive t =&gt; (a -&gt; Base t a) -&gt; a -&gt; t
+forall a.
+(a -&gt; Base (NonEmpty (a, a, a)) a) -&gt; a -&gt; NonEmpty (a, a, a)
+</span><a href="file:///home/yurrriq/.cabal/store/ghc-9.6.6/recursion-schemes-5.2.3-59d6a8a49972e2a4fa24fb073ee7f23ee68db39cd49c35394d3a2b202dd6f851/share/doc/html/src/Data.Functor.Foldable.html#ana"><span class="hs-identifier hs-var">ana</span></a></span><span> </span><span class="annot"><span class="annottext">(a, a, a) -&gt; NonEmptyF (a, a, a) (a, a, a)
+(a, a, a) -&gt; Base (NonEmpty (a, a, a)) (a, a, a)
+</span><a href="#local-6989586621679059586"><span class="hs-identifier hs-var">coalgebra</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">a
+</span><span class="hs-number">0</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">a
+</span><span class="hs-number">1</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679059582"><span class="hs-identifier hs-var">root</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-44"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">otherwise</span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-45"></span><span>      </span><span class="annot"><span class="annottext">NonEmpty Integer -&gt; ContinuedFraction
+</span><a href="Data.Rhythm.ContinuedFractions.html#ContinuedFraction"><span class="hs-identifier hs-var">ContinuedFraction</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">a -&gt; Integer
+forall a b. (Integral a, Num b) =&gt; a -&gt; b
+</span><span class="hs-identifier hs-var">fromIntegral</span></span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679059582"><span class="hs-identifier hs-var">root</span></a></span><span> </span><span class="annot"><span class="annottext">Integer -&gt; [Integer] -&gt; NonEmpty Integer
+forall a. a -&gt; [a] -&gt; NonEmpty a
+</span><span class="hs-operator hs-var">:|</span></span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span class="hs-special">)</span><span>
+</span><span id="line-46"></span><span>  </span><span class="hs-keyword">where</span><span>
+</span><span id="line-47"></span><span>    </span><span id="local-6989586621679059586"><span class="annot"><span class="annottext">coalgebra :: (a, a, a) -&gt; NonEmptyF (a, a, a) (a, a, a)
+</span><a href="#local-6989586621679059586"><span class="hs-identifier hs-var hs-var">coalgebra</span></a></span></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679059596"><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679059596"><span class="hs-identifier hs-var">a</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679059597"><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679059597"><span class="hs-identifier hs-var">b</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679059598"><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679059598"><span class="hs-identifier hs-var">c</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-48"></span><span>      </span><span class="annot"><span class="annottext">(a, a, a) -&gt; Maybe (a, a, a) -&gt; NonEmptyF (a, a, a) (a, a, a)
+forall a b. a -&gt; Maybe b -&gt; NonEmptyF a b
+</span><a href="file:///home/yurrriq/.cabal/store/ghc-9.6.6/recursion-schemes-5.2.3-59d6a8a49972e2a4fa24fb073ee7f23ee68db39cd49c35394d3a2b202dd6f851/share/doc/html/src/Data.Functor.Base.html#NonEmptyF"><span class="hs-identifier hs-var">NonEmptyF</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679059596"><span class="hs-identifier hs-var">a</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679059597"><span class="hs-identifier hs-var">b</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679059598"><span class="hs-identifier hs-var">c</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">(Maybe (a, a, a) -&gt; NonEmptyF (a, a, a) (a, a, a))
+-&gt; Maybe (a, a, a) -&gt; NonEmptyF (a, a, a) (a, a, a)
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span>
+</span><span id="line-49"></span><span>        </span><span class="hs-keyword">do</span><span>
+</span><span id="line-50"></span><span>          </span><span class="annot"><span class="annottext">Bool -&gt; Maybe ()
+forall (f :: * -&gt; *). Alternative f =&gt; Bool -&gt; f ()
+</span><span class="hs-identifier hs-var">guard</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679059598"><span class="hs-identifier hs-var">c</span></a></span><span> </span><span class="annot"><span class="annottext">a -&gt; a -&gt; Bool
+forall a. Eq a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">/=</span></span><span> </span><span class="annot"><span class="annottext">a
+</span><span class="hs-number">2</span></span><span> </span><span class="annot"><span class="annottext">a -&gt; a -&gt; a
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">*</span></span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679059582"><span class="hs-identifier hs-var">root</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-51"></span><span>          </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679059602"><span class="annot"><span class="annottext">a' :: a
+</span><a href="#local-6989586621679059602"><span class="hs-identifier hs-var hs-var">a'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679059597"><span class="hs-identifier hs-var">b</span></a></span><span> </span><span class="annot"><span class="annottext">a -&gt; a -&gt; a
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">*</span></span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679059598"><span class="hs-identifier hs-var">c</span></a></span><span> </span><span class="annot"><span class="annottext">a -&gt; a -&gt; a
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-glyph hs-var">-</span></span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679059596"><span class="hs-identifier hs-var">a</span></a></span><span>
+</span><span id="line-52"></span><span>          </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679059611"><span class="annot"><span class="annottext">b' :: a
+</span><a href="#local-6989586621679059611"><span class="hs-identifier hs-var hs-var">b'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679059612"><span class="hs-identifier hs-var">n'</span></a></span><span> </span><span class="annot"><span class="annottext">a -&gt; a -&gt; a
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-glyph hs-var">-</span></span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679059602"><span class="hs-identifier hs-var">a'</span></a></span><span> </span><span class="annot"><span class="annottext">a -&gt; a -&gt; a
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">*</span></span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679059602"><span class="hs-identifier hs-var">a'</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">a -&gt; a -&gt; a
+forall a. Integral a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">`div`</span></span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679059597"><span class="hs-identifier hs-var">b</span></a></span><span>
+</span><span id="line-53"></span><span>          </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679059621"><span class="annot"><span class="annottext">c' :: a
+</span><a href="#local-6989586621679059621"><span class="hs-identifier hs-var hs-var">c'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679059582"><span class="hs-identifier hs-var">root</span></a></span><span> </span><span class="annot"><span class="annottext">a -&gt; a -&gt; a
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">+</span></span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679059602"><span class="hs-identifier hs-var">a'</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">a -&gt; a -&gt; a
+forall a. Integral a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">`div`</span></span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679059611"><span class="hs-identifier hs-var">b'</span></a></span><span>
+</span><span id="line-54"></span><span>          </span><span class="annot"><span class="annottext">(a, a, a) -&gt; Maybe (a, a, a)
+forall a. a -&gt; Maybe a
+forall (f :: * -&gt; *) a. Applicative f =&gt; a -&gt; f a
+</span><span class="hs-identifier hs-var">pure</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679059602"><span class="hs-identifier hs-var">a'</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679059611"><span class="hs-identifier hs-var">b'</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679059621"><span class="hs-identifier hs-var">c'</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-55"></span><span>    </span><span id="local-6989586621679059582"><span class="annot"><span class="annottext">root :: a
+</span><a href="#local-6989586621679059582"><span class="hs-identifier hs-var hs-var">root</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">a -&gt; a
+forall a. Integral a =&gt; a -&gt; a
+</span><a href="Data.Rhythm.ContinuedFractions.html#isqrt"><span class="hs-identifier hs-var">isqrt</span></a></span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679059581"><span class="hs-identifier hs-var">n</span></a></span><span>
+</span><span id="line-56"></span><span>    </span><span id="local-6989586621679059612"><span class="annot"><span class="annottext">n' :: a
+</span><a href="#local-6989586621679059612"><span class="hs-identifier hs-var hs-var">n'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">a -&gt; a
+forall a b. (Integral a, Num b) =&gt; a -&gt; b
+</span><span class="hs-identifier hs-var">fromIntegral</span></span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679059581"><span class="hs-identifier hs-var">n</span></a></span><span>
+</span><span id="line-57"></span><span>
+</span><span id="line-58"></span><span id="local-6989586621679059425"><span class="annot"><a href="Data.Rhythm.ContinuedFractions.html#isqrt"><span class="hs-identifier hs-type">isqrt</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Integral</span></span><span> </span><span class="annot"><a href="#local-6989586621679059425"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679059425"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679059425"><span class="hs-identifier hs-type">a</span></a></span></span><span>
+</span><span id="line-59"></span><span id="isqrt"><span class="annot"><span class="annottext">isqrt :: forall a. Integral a =&gt; a -&gt; a
+</span><a href="Data.Rhythm.ContinuedFractions.html#isqrt"><span class="hs-identifier hs-var hs-var">isqrt</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Double -&gt; a
+forall b. Integral b =&gt; Double -&gt; b
+forall a b. (RealFrac a, Integral b) =&gt; a -&gt; b
+</span><span class="hs-identifier hs-var">truncate</span></span><span> </span><span class="annot"><span class="annottext">(Double -&gt; a) -&gt; (a -&gt; Double) -&gt; a -&gt; a
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">forall a. Floating a =&gt; a -&gt; a
+</span><span class="hs-identifier hs-var">sqrt</span></span><span> </span><span class="hs-glyph">@</span><span class="annot"><span class="hs-identifier hs-type">Double</span></span><span> </span><span class="annot"><span class="annottext">(Double -&gt; Double) -&gt; (a -&gt; Double) -&gt; a -&gt; Double
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">a -&gt; Double
+forall a b. (Integral a, Num b) =&gt; a -&gt; b
+</span><span class="hs-identifier hs-var">fromIntegral</span></span><span>
+</span><span id="line-60"></span></pre></body></html>

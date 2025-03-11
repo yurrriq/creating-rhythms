@@ -14,6 +14,12 @@ indent_size = 2
 [{compam,neckam,partam}.c]
 indent_size = unset
 
+[docs/**/*]
+indent_style = unset
+insert_final_newline = unset
+end_of_line = unset
+trim_trailing_whitespace = unset
+
 [{LICENSE,emacs.el}]
 indent_size = unset
 
