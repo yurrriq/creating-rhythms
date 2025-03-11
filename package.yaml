@@ -57,6 +57,9 @@ executables:
   compm:
     <<: *executable
     main: compm/Main.hs
+  compmrnd:
+    <<: *executable
+    main: compmrnd/Main.hs
   comprnd:
     <<: *executable
     main: comprnd/Main.hs
