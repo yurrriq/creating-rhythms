@@ -76,6 +76,13 @@ executables:
       - CreatingRhythms
       - combinat
       - optparse-applicative
+  parta:
+    <<: *executable
+    main: parta/Main.hs
+    dependencies:
+      - CreatingRhythms
+      - combinat
+      - optparse-applicative
 tests:
   unit:
     build-tools:
