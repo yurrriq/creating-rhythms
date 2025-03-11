@@ -69,6 +69,13 @@ executables:
   neck:
     <<: *executable
     main: neck/Main.hs
+  part:
+    <<: *executable
+    main: part/Main.hs
+    dependencies:
+      - CreatingRhythms
+      - combinat
+      - optparse-applicative
 tests:
   unit:
     build-tools:
