@@ -18,6 +18,6 @@ printFraction :: [Integer] -> IO ()
 printFraction =
   uncurry (printf "%d %d\n")
     . (numerator &&& denominator)
-    . Data.Rhythm.ContinuedFractions.collapseFraction
+    . collapseFraction
     . ContinuedFraction
     . NE.fromList
