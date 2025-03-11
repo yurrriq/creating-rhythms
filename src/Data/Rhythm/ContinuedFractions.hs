@@ -1,6 +1,11 @@
 {-# LANGUAGE TypeApplications #-}
 
-module Data.Rhythm.ContinuedFractions where
+module Data.Rhythm.ContinuedFractions
+  ( ContinuedFraction (..),
+    collapseFraction,
+    continuedFractionSqrt,
+  )
+where
 
 import Control.Monad (guard)
 import Data.Bifunctor (first)
