@@ -45,6 +45,9 @@ executables:
   cfcv:
     <<: *executable
     main: cfcv/Main.hs
+  comp:
+    <<: *executable
+    main: comp/Main.hs
   int2b:
     <<: *executable
     main: int2b/Main.hs
