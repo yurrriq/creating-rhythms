@@ -1,12 +1,17 @@
+{-# LANGUAGE BangPatterns #-}
+
 module Data.Rhythm.Binary
   ( binaryToIntervals,
     intervalsToBinary,
     RSW.necklaces,
+    necklacesPopCount,
   )
 where
 
+import Data.Bits (popCount)
 import Data.List.Extra (splitOn)
 import qualified Data.Rhythm.Binary.RuskeySavageWang as RSW
+import Data.Tree (flatten)
 
 -- | Convert a binary string to a list of intervals.
 --
@@ -23,3 +28,13 @@ binaryToIntervals =
 intervalsToBinary :: [Int] -> String
 intervalsToBinary =
   concatMap (('1' :) . (`replicate` '0') . subtract 1)
+
+-- | All binary necklaces with a given number of ones of a given length.
+--
+-- >>> necklacesPopCount 3 6
+-- [[1,1,1,0,0,0],[1,1,0,1,0,0],[1,0,1,1,0,0],[1,0,1,0,1,0]]
+necklacesPopCount :: Int -> Int -> [[Int]]
+necklacesPopCount !m !n =
+  RSW.nodesToNecklaces n $
+    filter ((== m) . popCount) $
+      flatten (RSW.necklaces' n)

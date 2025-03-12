@@ -72,6 +72,9 @@ executables:
   neck:
     <<: *executable
     main: neck/Main.hs
+  neckm:
+    <<: *executable
+    main: neckm/Main.hs
   part:
     <<: *executable
     main: part/Main.hs

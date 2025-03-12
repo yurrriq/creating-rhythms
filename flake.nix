@@ -33,6 +33,19 @@
     flake-parts.lib.mkFlake { inherit inputs; } {
       flake = {
         overlays.default = _final: prev: {
+          haskellPackages = prev.haskellPackages.override {
+            overrides = _hfinal: hprev: {
+              combinat = hprev.callCabal2nix "combinat"
+                (prev.fetchFromGitHub {
+                  owner = "yurrriq";
+                  repo = "combinat";
+                  rev = "4aff8ad8721fc2c006230e0b9d7b2ffc87569186";
+                  hash = "sha256-BDqa4076XnSpysKVlGMMBAzTYnWcddTRZ+8QVKIBI+o=";
+                })
+                { };
+            };
+          };
+
           myEmacs = prev.emacsWithPackagesFromUsePackage {
             alwaysEnsure = true;
             config = ./emacs.el;

@@ -1,9 +1,23 @@
 {-# LANGUAGE BangPatterns #-}
 {-# LANGUAGE UnicodeSyntax #-}
 
+-- |
+-- Module      : Data.Rhythm.Binary.RuskeySavageWang
+-- Copyright   : (c) Eric Bailey, 2025
+--
+-- License     : MIT
+-- Maintainer  : eric@ericb.me
+-- Stability   : experimental
+-- Portability : POSIX
+--
+-- = References
+--   - Frank Ruskey, Carla Savage, Terry Min Yih Wang, Generating necklaces,
+--     Journal of Algorithms, Volume 13, Issue 3, 1992, Pages 414-430, ISSN
+--     0196-6774, https://doi.org/10.1016/0196-6774(92)90047-G.
 module Data.Rhythm.Binary.RuskeySavageWang
   ( necklaces,
     necklaces',
+    nodesToNecklaces,
   )
 where
 
@@ -20,9 +34,8 @@ import Data.Tree (Tree (..), flatten, unfoldTree)
 -- [[1,1,1,1],[1,1,1,0],[1,1,0,0],[1,0,1,0],[1,0,0,0],[0,0,0,0]]
 necklaces :: Int -> [[Int]]
 necklaces !n =
-  sortOn Down $
-    map (padUpTo n . digits 2) $
-      flatten (necklaces' n)
+  nodesToNecklaces n $
+    flatten (necklaces' n)
 
 -- | All binary necklaces of a given length, encoded as numbers.
 --
@@ -61,6 +74,15 @@ necklaces' !n = Node 0 [unfoldTree search 1]
 
     -- 1ⁿ
     m = shiftL 1 n - 1
+
+-- | Convert a list of nodes to binary necklaces of a given length.
+--
+-- >>> nodesToNecklaces 4 [3,5]
+-- [[1,1,0,0],[1,0,1,0]]
+nodesToNecklaces :: Int -> [Integer] -> [[Int]]
+nodesToNecklaces !n =
+  sortOn Down
+    . map (padUpTo n . digits 2)
 
 -- modified from Data.FastDigits
 padUpTo :: Int -> [Int] -> [Int]
