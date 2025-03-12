@@ -1,5 +1,25 @@
 {-# LANGUAGE TypeApplications #-}
 
+-- |
+-- Module      : Data.Rhythm.ContinuedFractions
+-- Copyright   : (c) Eric Bailey, 2024-2025
+--
+-- License     : MIT
+-- Maintainer  : eric@ericb.me
+-- Stability   : experimental
+-- Portability : POSIX
+--
+-- [Simple continued fractions](https://mathworld.wolfram.com/SimpleContinuedFraction.html)
+-- represented by nonempty lists of terms.
+--
+--
+-- \[
+--   \begin{align*}
+--     [b_0; b_1, b_2, b_3, \dotsc] &=
+--     b_0 + \cfrac{1}{b_1 + \cfrac{1}{b_2 + \cfrac{1}{b_3 + \dotsm}}} \\
+--     &= b_0 + \mathop{\vcenter{\Huge\mathcal{K}}}_{n=1}^{\infty} \frac{1}{b_n}
+--   \end{align*}
+-- \]
 module Data.Rhythm.ContinuedFractions
   ( ContinuedFraction (..),
     collapseFraction,
@@ -17,9 +37,9 @@ import Data.Maybe (listToMaybe)
 import Data.Tuple.Extra (thd3)
 
 -- | A 'ContinuedFraction' is a 'NonEmpty', potentially infinite, list of
--- integer 'coefficients'.
+-- integer 'terms'.
 newtype ContinuedFraction = ContinuedFraction
-  {coefficients :: NonEmpty Integer}
+  {terms :: NonEmpty Integer}
   deriving (Eq, Ord)
 
 instance Show ContinuedFraction where
@@ -35,7 +55,7 @@ instance Show ContinuedFraction where
 
 -- | Evaluate a finite 'ContinuedFraction'.
 collapseFraction :: ContinuedFraction -> Rational
-collapseFraction = cata (algebra . first toRational) . coefficients
+collapseFraction = cata (algebra . first toRational) . terms
   where
     algebra (NonEmptyF i Nothing) = i
     algebra (NonEmptyF i (Just d)) = i + recip d

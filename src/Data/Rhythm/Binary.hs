@@ -1,5 +1,13 @@
 {-# LANGUAGE BangPatterns #-}
 
+-- |
+-- Module      : Data.Rhythm.Binary
+-- Copyright   : (c) Eric Bailey, 2024-2025
+--
+-- License     : MIT
+-- Maintainer  : eric@ericb.me
+-- Stability   : experimental
+-- Portability : POSIX
 module Data.Rhythm.Binary
   ( binaryToIntervals,
     intervalsToBinary,

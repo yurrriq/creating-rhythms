@@ -1,3 +1,11 @@
+-- |
+-- Module      : Data.Rhythm.Compositions
+-- Copyright   : (c) Eric Bailey, 2024-2025
+--
+-- License     : MIT
+-- Maintainer  : eric@ericb.me
+-- Stability   : experimental
+-- Portability : POSIX
 module Data.Rhythm.Compositions where
 
 import Data.Bool (bool)

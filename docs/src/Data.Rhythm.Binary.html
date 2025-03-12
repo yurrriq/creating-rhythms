@@ -1,26 +1,34 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-pragma">{-# LANGUAGE BangPatterns #-}</span><span>
 </span><span id="line-2"></span><span>
-</span><span id="line-3"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Data.Rhythm.Binary</span><span>
-</span><span id="line-4"></span><span>  </span><span class="hs-special">(</span><span> </span><span class="annot"><a href="Data.Rhythm.Binary.html#binaryToIntervals"><span class="hs-identifier">binaryToIntervals</span></a></span><span class="hs-special">,</span><span>
-</span><span id="line-5"></span><span>    </span><span class="annot"><a href="Data.Rhythm.Binary.html#intervalsToBinary"><span class="hs-identifier">intervalsToBinary</span></a></span><span class="hs-special">,</span><span>
-</span><span id="line-6"></span><span>    </span><span class="annot"><a href="Data.Rhythm.Binary.RuskeySavageWang.html#necklaces"><span class="hs-identifier">RSW.necklaces</span></a></span><span class="hs-special">,</span><span>
-</span><span id="line-7"></span><span>    </span><span class="annot"><a href="Data.Rhythm.Binary.html#necklacesPopCount"><span class="hs-identifier">necklacesPopCount</span></a></span><span class="hs-special">,</span><span>
-</span><span id="line-8"></span><span>  </span><span class="hs-special">)</span><span>
-</span><span id="line-9"></span><span class="hs-keyword">where</span><span>
-</span><span id="line-10"></span><span>
-</span><span id="line-11"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Bits</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">popCount</span></span><span class="hs-special">)</span><span>
-</span><span id="line-12"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="file:///home/yurrriq/.cabal/store/ghc-9.6.6/extra-1.8-e09eba2a1105d1f1e52cc5ddff8c02a6150c09ebdc78d13517061fbe14707f0c/share/doc/html/src/Data.List.Extra.html"><span class="hs-identifier">Data.List.Extra</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="file:///home/yurrriq/.cabal/store/ghc-9.6.6/extra-1.8-e09eba2a1105d1f1e52cc5ddff8c02a6150c09ebdc78d13517061fbe14707f0c/share/doc/html/src/Data.List.Extra.html#splitOn"><span class="hs-identifier">splitOn</span></a></span><span class="hs-special">)</span><span>
-</span><span id="line-13"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><a href="Data.Rhythm.Binary.RuskeySavageWang.html"><span class="hs-identifier">Data.Rhythm.Binary.RuskeySavageWang</span></a></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">RSW</span></span><span>
-</span><span id="line-14"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Tree</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">flatten</span></span><span class="hs-special">)</span><span>
-</span><span id="line-15"></span><span>
-</span><span id="line-16"></span><span class="hs-comment">-- | Convert a binary string to a list of intervals.</span><span>
-</span><span id="line-17"></span><span class="hs-comment">--</span><span>
-</span><span id="line-18"></span><span class="hs-comment">-- &gt;&gt;&gt; binaryToIntervals &quot;1010010001001000&quot;</span><span>
-</span><span id="line-19"></span><span class="hs-comment">-- [2,3,4,3,4]</span><span>
-</span><span id="line-20"></span><span class="annot"><a href="Data.Rhythm.Binary.html#binaryToIntervals"><span class="hs-identifier hs-type">binaryToIntervals</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">[</span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span class="hs-special">]</span><span>
-</span><span id="line-21"></span><span id="binaryToIntervals"><span class="annot"><span class="annottext">binaryToIntervals :: [Char] -&gt; [Int]
+</span><span id="line-3"></span><span class="hs-comment">-- |</span><span>
+</span><span id="line-4"></span><span class="hs-comment">-- Module      : Data.Rhythm.Binary</span><span>
+</span><span id="line-5"></span><span class="hs-comment">-- Copyright   : (c) Eric Bailey, 2024-2025</span><span>
+</span><span id="line-6"></span><span class="hs-comment">--</span><span>
+</span><span id="line-7"></span><span class="hs-comment">-- License     : MIT</span><span>
+</span><span id="line-8"></span><span class="hs-comment">-- Maintainer  : eric@ericb.me</span><span>
+</span><span id="line-9"></span><span class="hs-comment">-- Stability   : experimental</span><span>
+</span><span id="line-10"></span><span class="hs-comment">-- Portability : POSIX</span><span>
+</span><span id="line-11"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Data.Rhythm.Binary</span><span>
+</span><span id="line-12"></span><span>  </span><span class="hs-special">(</span><span> </span><span class="annot"><a href="Data.Rhythm.Binary.html#binaryToIntervals"><span class="hs-identifier">binaryToIntervals</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-13"></span><span>    </span><span class="annot"><a href="Data.Rhythm.Binary.html#intervalsToBinary"><span class="hs-identifier">intervalsToBinary</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-14"></span><span>    </span><span class="annot"><a href="Data.Rhythm.Binary.RuskeySavageWang.html#necklaces"><span class="hs-identifier">RSW.necklaces</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-15"></span><span>    </span><span class="annot"><a href="Data.Rhythm.Binary.html#necklacesPopCount"><span class="hs-identifier">necklacesPopCount</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-16"></span><span>  </span><span class="hs-special">)</span><span>
+</span><span id="line-17"></span><span class="hs-keyword">where</span><span>
+</span><span id="line-18"></span><span>
+</span><span id="line-19"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Bits</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">popCount</span></span><span class="hs-special">)</span><span>
+</span><span id="line-20"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="file:///home/yurrriq/.cabal/store/ghc-9.6.6/extra-1.8-e09eba2a1105d1f1e52cc5ddff8c02a6150c09ebdc78d13517061fbe14707f0c/share/doc/html/src/Data.List.Extra.html"><span class="hs-identifier">Data.List.Extra</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="file:///home/yurrriq/.cabal/store/ghc-9.6.6/extra-1.8-e09eba2a1105d1f1e52cc5ddff8c02a6150c09ebdc78d13517061fbe14707f0c/share/doc/html/src/Data.List.Extra.html#splitOn"><span class="hs-identifier">splitOn</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-21"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><a href="Data.Rhythm.Binary.RuskeySavageWang.html"><span class="hs-identifier">Data.Rhythm.Binary.RuskeySavageWang</span></a></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">RSW</span></span><span>
+</span><span id="line-22"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Tree</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">flatten</span></span><span class="hs-special">)</span><span>
+</span><span id="line-23"></span><span>
+</span><span id="line-24"></span><span class="hs-comment">-- | Convert a binary string to a list of intervals.</span><span>
+</span><span id="line-25"></span><span class="hs-comment">--</span><span>
+</span><span id="line-26"></span><span class="hs-comment">-- &gt;&gt;&gt; binaryToIntervals &quot;1010010001001000&quot;</span><span>
+</span><span id="line-27"></span><span class="hs-comment">-- [2,3,4,3,4]</span><span>
+</span><span id="line-28"></span><span class="annot"><a href="Data.Rhythm.Binary.html#binaryToIntervals"><span class="hs-identifier hs-type">binaryToIntervals</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">[</span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span class="hs-special">]</span><span>
+</span><span id="line-29"></span><span id="binaryToIntervals"><span class="annot"><span class="annottext">binaryToIntervals :: [Char] -&gt; [Int]
 </span><a href="Data.Rhythm.Binary.html#binaryToIntervals"><span class="hs-identifier hs-var hs-var">binaryToIntervals</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
-</span><span id="line-22"></span><span>  </span><span class="annot"><span class="annottext">([Char] -&gt; Int) -&gt; [[Char]] -&gt; [Int]
+</span><span id="line-30"></span><span>  </span><span class="annot"><span class="annottext">([Char] -&gt; Int) -&gt; [[Char]] -&gt; [Int]
 forall a b. (a -&gt; b) -&gt; [a] -&gt; [b]
 </span><span class="hs-identifier hs-var">map</span></span><span> </span><span class="hs-special">(</span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
 forall a. Num a =&gt; a -&gt; a -&gt; a
@@ -41,15 +49,15 @@ forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
 forall a. (HasCallStack, Eq a) =&gt; [a] -&gt; [a] -&gt; [[a]]
 </span><a href="file:///home/yurrriq/.cabal/store/ghc-9.6.6/extra-1.8-e09eba2a1105d1f1e52cc5ddff8c02a6150c09ebdc78d13517061fbe14707f0c/share/doc/html/src/Data.List.Extra.html#splitOn"><span class="hs-identifier hs-var">splitOn</span></a></span><span> </span><span class="annot"><span class="annottext">[Char]
 </span><span class="hs-string">&quot;1&quot;</span></span><span>
-</span><span id="line-23"></span><span>
-</span><span id="line-24"></span><span class="hs-comment">-- | Convert a list of intervals to a binary string.</span><span>
-</span><span id="line-25"></span><span class="hs-comment">--</span><span>
-</span><span id="line-26"></span><span class="hs-comment">-- &gt;&gt;&gt; intervalsToBinary [2,3,4,3,4]</span><span>
-</span><span id="line-27"></span><span class="hs-comment">-- &quot;1010010001001000&quot;</span><span>
-</span><span id="line-28"></span><span class="annot"><a href="Data.Rhythm.Binary.html#intervalsToBinary"><span class="hs-identifier hs-type">intervalsToBinary</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">[</span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span class="hs-special">]</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span>
-</span><span id="line-29"></span><span id="intervalsToBinary"><span class="annot"><span class="annottext">intervalsToBinary :: [Int] -&gt; [Char]
+</span><span id="line-31"></span><span>
+</span><span id="line-32"></span><span class="hs-comment">-- | Convert a list of intervals to a binary string.</span><span>
+</span><span id="line-33"></span><span class="hs-comment">--</span><span>
+</span><span id="line-34"></span><span class="hs-comment">-- &gt;&gt;&gt; intervalsToBinary [2,3,4,3,4]</span><span>
+</span><span id="line-35"></span><span class="hs-comment">-- &quot;1010010001001000&quot;</span><span>
+</span><span id="line-36"></span><span class="annot"><a href="Data.Rhythm.Binary.html#intervalsToBinary"><span class="hs-identifier hs-type">intervalsToBinary</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">[</span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span class="hs-special">]</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span>
+</span><span id="line-37"></span><span id="intervalsToBinary"><span class="annot"><span class="annottext">intervalsToBinary :: [Int] -&gt; [Char]
 </span><a href="Data.Rhythm.Binary.html#intervalsToBinary"><span class="hs-identifier hs-var hs-var">intervalsToBinary</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
-</span><span id="line-30"></span><span>  </span><span class="annot"><span class="annottext">(Int -&gt; [Char]) -&gt; [Int] -&gt; [Char]
+</span><span id="line-38"></span><span>  </span><span class="annot"><span class="annottext">(Int -&gt; [Char]) -&gt; [Int] -&gt; [Char]
 forall (t :: * -&gt; *) a b. Foldable t =&gt; (a -&gt; [b]) -&gt; t a -&gt; [b]
 </span><span class="hs-identifier hs-var">concatMap</span></span><span> </span><span class="hs-special">(</span><span class="hs-special">(</span><span class="annot"><span class="annottext">Char
 </span><span class="hs-char">'1'</span></span><span> </span><span class="annot"><span class="annottext">Char -&gt; [Char] -&gt; [Char]
@@ -65,22 +73,22 @@ forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
 forall a. Num a =&gt; a -&gt; a -&gt; a
 </span><span class="hs-identifier hs-var">subtract</span></span><span> </span><span class="annot"><span class="annottext">Int
 </span><span class="hs-number">1</span></span><span class="hs-special">)</span><span>
-</span><span id="line-31"></span><span>
-</span><span id="line-32"></span><span class="hs-comment">-- | All binary necklaces with a given number of ones of a given length.</span><span>
-</span><span id="line-33"></span><span class="hs-comment">--</span><span>
-</span><span id="line-34"></span><span class="hs-comment">-- &gt;&gt;&gt; necklacesPopCount 3 6</span><span>
-</span><span id="line-35"></span><span class="hs-comment">-- [[1,1,1,0,0,0],[1,1,0,1,0,0],[1,0,1,1,0,0],[1,0,1,0,1,0]]</span><span>
-</span><span id="line-36"></span><span class="annot"><a href="Data.Rhythm.Binary.html#necklacesPopCount"><span class="hs-identifier hs-type">necklacesPopCount</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">[</span><span class="hs-special">[</span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span class="hs-special">]</span><span class="hs-special">]</span><span>
-</span><span id="line-37"></span><span id="necklacesPopCount"><span class="annot"><span class="annottext">necklacesPopCount :: Int -&gt; Int -&gt; [[Int]]
+</span><span id="line-39"></span><span>
+</span><span id="line-40"></span><span class="hs-comment">-- | All binary necklaces with a given number of ones of a given length.</span><span>
+</span><span id="line-41"></span><span class="hs-comment">--</span><span>
+</span><span id="line-42"></span><span class="hs-comment">-- &gt;&gt;&gt; necklacesPopCount 3 6</span><span>
+</span><span id="line-43"></span><span class="hs-comment">-- [[1,1,1,0,0,0],[1,1,0,1,0,0],[1,0,1,1,0,0],[1,0,1,0,1,0]]</span><span>
+</span><span id="line-44"></span><span class="annot"><a href="Data.Rhythm.Binary.html#necklacesPopCount"><span class="hs-identifier hs-type">necklacesPopCount</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">[</span><span class="hs-special">[</span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span class="hs-special">]</span><span class="hs-special">]</span><span>
+</span><span id="line-45"></span><span id="necklacesPopCount"><span class="annot"><span class="annottext">necklacesPopCount :: Int -&gt; Int -&gt; [[Int]]
 </span><a href="Data.Rhythm.Binary.html#necklacesPopCount"><span class="hs-identifier hs-var hs-var">necklacesPopCount</span></a></span></span><span> </span><span class="hs-glyph">!</span><span id="local-6989586621679059269"><span class="annot"><span class="annottext">Int
 </span><a href="#local-6989586621679059269"><span class="hs-identifier hs-var">m</span></a></span></span><span> </span><span class="hs-glyph">!</span><span id="local-6989586621679059270"><span class="annot"><span class="annottext">Int
 </span><a href="#local-6989586621679059270"><span class="hs-identifier hs-var">n</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
-</span><span id="line-38"></span><span>  </span><span class="annot"><span class="annottext">Int -&gt; [Integer] -&gt; [[Int]]
+</span><span id="line-46"></span><span>  </span><span class="annot"><span class="annottext">Int -&gt; [Integer] -&gt; [[Int]]
 </span><a href="Data.Rhythm.Binary.RuskeySavageWang.html#nodesToNecklaces"><span class="hs-identifier hs-var">RSW.nodesToNecklaces</span></a></span><span> </span><span class="annot"><span class="annottext">Int
 </span><a href="#local-6989586621679059270"><span class="hs-identifier hs-var">n</span></a></span><span> </span><span class="annot"><span class="annottext">([Integer] -&gt; [[Int]]) -&gt; [Integer] -&gt; [[Int]]
 forall a b. (a -&gt; b) -&gt; a -&gt; b
 </span><span class="hs-operator hs-var">$</span></span><span>
-</span><span id="line-39"></span><span>    </span><span class="annot"><span class="annottext">(Integer -&gt; Bool) -&gt; [Integer] -&gt; [Integer]
+</span><span id="line-47"></span><span>    </span><span class="annot"><span class="annottext">(Integer -&gt; Bool) -&gt; [Integer] -&gt; [Integer]
 forall a. (a -&gt; Bool) -&gt; [a] -&gt; [a]
 </span><span class="hs-identifier hs-var">filter</span></span><span> </span><span class="hs-special">(</span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Bool
 forall a. Eq a =&gt; a -&gt; a -&gt; Bool
@@ -92,10 +100,10 @@ forall a. Bits a =&gt; a -&gt; Int
 </span><span class="hs-identifier hs-var">popCount</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">([Integer] -&gt; [Integer]) -&gt; [Integer] -&gt; [Integer]
 forall a b. (a -&gt; b) -&gt; a -&gt; b
 </span><span class="hs-operator hs-var">$</span></span><span>
-</span><span id="line-40"></span><span>      </span><span class="annot"><span class="annottext">Tree Integer -&gt; [Integer]
+</span><span id="line-48"></span><span>      </span><span class="annot"><span class="annottext">Tree Integer -&gt; [Integer]
 forall a. Tree a -&gt; [a]
 </span><span class="hs-identifier hs-var">flatten</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int -&gt; Tree Integer
 forall a. (Integral a, Bits a) =&gt; Int -&gt; Tree a
 </span><a href="Data.Rhythm.Binary.RuskeySavageWang.html#necklaces%27"><span class="hs-identifier hs-var">RSW.necklaces'</span></a></span><span> </span><span class="annot"><span class="annottext">Int
 </span><a href="#local-6989586621679059270"><span class="hs-identifier hs-var">n</span></a></span><span class="hs-special">)</span><span>
-</span><span id="line-41"></span></pre></body></html>
+</span><span id="line-49"></span></pre></body></html>

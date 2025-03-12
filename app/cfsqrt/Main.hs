@@ -9,7 +9,7 @@ main :: IO ()
 main =
   putStrLn
     . (\(n :| ds) -> printf "%d ( %s )" n (unwords (map show ds)))
-    . coefficients
+    . terms
     . continuedFractionSqrt @Integer
     =<< customExecParser p opts
   where
