@@ -6,6 +6,9 @@
 -- Maintainer  : eric@ericb.me
 -- Stability   : experimental
 -- Portability : POSIX
+--
+-- [Combinatorial compositions](https://mathworld.wolfram.com/Composition.html),
+-- i.e., [partitions]("Data.Rhythm.Partitions") in which order is significant.
 module Data.Rhythm.Compositions where
 
 import Data.Bool (bool)
@@ -30,13 +33,31 @@ compositionsAllowed allowed = filter (all (`elem` allowed)) . compositions
 --
 -- >>> compositionsLength 2 5
 -- [[1,4],[2,3],[3,2],[4,1]]
-compositionsLength :: (Integral a) => a -> a -> [Composition]
+--
+-- The number of positive compositions of \(n\) into \(k\) parts is given by the
+-- following formula.
+--
+-- \[
+--   \begin{align*}
+--     C_k(n) &= \binom{n - 1}{k - 1} \\
+--     &= \frac{(n-1)!}{(k-1)!(n-k)!}
+--   \end{align*}
+-- \]
+--
+-- >>> let _C k n = toInteger (length (compositionsLength k n))
+-- >>> let fact n = product [1 .. n]
+-- >>> _C 2 5 == fact (5 - 1) `div` (fact (2 - 1) * fact (5 - 2))
+-- True
+compositionsLength :: Int -> Int -> [[Int]]
 compositionsLength = compositions1
 
 -- | Positive compositions of a given length with allowed parts.
 --
--- >>> compositionsLengthAllowed 2 [1,2,3] 4
--- [[1,3],[2,2],[3,1]]
+-- >>> compositionsLengthAllowed 2 [2,3] 5
+-- [[2,3],[3,2]]
+--
+-- >>> filter (all (`elem` [2,3])) (compositionsLength 2 5)
+-- [[2,3],[3,2]]
 compositionsLengthAllowed :: Int -> [Int] -> Int -> [Composition]
 compositionsLengthAllowed len allowed =
   filter (all (`elem` allowed)) . compositionsLength len

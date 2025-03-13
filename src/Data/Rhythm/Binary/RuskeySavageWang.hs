@@ -10,6 +10,9 @@
 -- Stability   : experimental
 -- Portability : POSIX
 --
+-- Binary [necklaces](http://combos.org/necklace), internally encoded as
+-- numbers.
+--
 -- = References
 --   - Frank Ruskey, Carla Savage, Terry Min Yih Wang, Generating necklaces,
 --     Journal of Algorithms, Volume 13, Issue 3, 1992, Pages 414-430, ISSN

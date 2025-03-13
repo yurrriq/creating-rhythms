@@ -1,5 +1,3 @@
-{-# LANGUAGE TypeApplications #-}
-
 import Data.Rhythm.Compositions (compositionsLength)
 import Options.Applicative
 
@@ -8,7 +6,7 @@ main =
   putStr
     . unlines
     . map (unwords . map show)
-    . uncurry (flip (compositionsLength @Integer))
+    . uncurry (flip compositionsLength)
     =<< customExecParser p opts
   where
     opts =
