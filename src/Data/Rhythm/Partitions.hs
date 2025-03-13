@@ -6,6 +6,10 @@
 -- Maintainer  : eric@ericb.me
 -- Stability   : experimental
 -- Portability : POSIX
+--
+-- [Integer partitions](https://mathworld.wolfram.com/Partition.html), i.e.,
+-- representations of integers as a sum of positive integers where the order of
+-- the summands is not significant.
 module Data.Rhythm.Partitions
   ( partitions,
     partitionsAllowed,

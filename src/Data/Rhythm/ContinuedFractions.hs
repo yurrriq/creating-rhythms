@@ -12,7 +12,6 @@
 -- [Simple continued fractions](https://mathworld.wolfram.com/SimpleContinuedFraction.html)
 -- represented by nonempty lists of terms.
 --
---
 -- \[
 --   \begin{align*}
 --     [b_0; b_1, b_2, b_3, \dotsc] &=
@@ -38,6 +37,9 @@ import Data.Tuple.Extra (thd3)
 
 -- | A 'ContinuedFraction' is a 'NonEmpty', potentially infinite, list of
 -- integer 'terms'.
+--
+-- >>> ContinuedFraction (1 :| [2,3,4])
+-- [1;2,3,4]
 newtype ContinuedFraction = ContinuedFraction
   {terms :: NonEmpty Integer}
   deriving (Eq, Ord)
@@ -54,6 +56,9 @@ instance Show ContinuedFraction where
       (ys, zs) = splitAt 11 xs
 
 -- | Evaluate a finite 'ContinuedFraction'.
+--
+-- >>> collapseFraction (ContinuedFraction (1 :| [2,3,4]))
+-- 43 % 30
 collapseFraction :: ContinuedFraction -> Rational
 collapseFraction = cata (algebra . first toRational) . terms
   where
@@ -62,6 +67,9 @@ collapseFraction = cata (algebra . first toRational) . terms
 
 -- | Calculate the 'ContinuedFraction' representation of the square root of a
 -- given number.
+--
+-- >>> continuedFractionSqrt 7
+-- [2;1,1,1,4]
 continuedFractionSqrt :: (Integral a) => a -> ContinuedFraction
 continuedFractionSqrt n
   | root * root < n =

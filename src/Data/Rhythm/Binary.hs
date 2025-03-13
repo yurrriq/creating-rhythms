@@ -8,6 +8,8 @@
 -- Maintainer  : eric@ericb.me
 -- Stability   : experimental
 -- Portability : POSIX
+--
+-- Conversion between binary strings and lists of intervals.
 module Data.Rhythm.Binary
   ( binaryToIntervals,
     intervalsToBinary,
