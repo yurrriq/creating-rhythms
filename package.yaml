@@ -23,6 +23,8 @@ library:
     - containers
     - extra
     - fast-digits
+    - lens
+    - mtl
     - random
     - recursion-schemes
 benchmarks:
@@ -69,6 +71,9 @@ executables:
   comprnd:
     <<: *executable
     main: comprnd/Main.hs
+  debruijn:
+    <<: *executable
+    main: debruijn/Main.hs
   int2b:
     <<: *executable
     main: int2b/Main.hs
