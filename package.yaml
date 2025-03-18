@@ -35,7 +35,7 @@ benchmarks:
     dependencies:
       - CreatingRhythms
       - criterion
-.executable: &executable
+_executable: &executable
   dependencies:
     - CreatingRhythms
     - optparse-applicative
