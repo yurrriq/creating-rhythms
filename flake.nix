@@ -105,6 +105,7 @@
             haskellPackages.hlint
             haskellPackages.ormolu
             haskellPackages.pointfree
+            just
             myEmacs
             nixd
             rust-analyzer-nightly
