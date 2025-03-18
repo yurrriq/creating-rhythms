@@ -111,6 +111,9 @@ executables:
       - CreatingRhythms
       - combinat
       - optparse-applicative
+  permi:
+    <<: *executable
+    main: permi/Main.hs
 tests:
   unit:
     build-tools:
