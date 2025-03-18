@@ -114,6 +114,9 @@ executables:
   permi:
     <<: *executable
     main: permi/Main.hs
+  pfold:
+    <<: *executable
+    main: pfold/Main.hs
 tests:
   unit:
     build-tools:
