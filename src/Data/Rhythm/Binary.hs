@@ -16,10 +16,10 @@
 -- intervals.
 module Data.Rhythm.Binary
   ( binaryToIntervals,
+    deBruijnSequence,
     intervalsToBinary,
     RSW.necklaces,
     necklacesPopCount,
-    deBruijnSequence,
   )
 where
 
@@ -41,24 +41,6 @@ import Data.Tree (flatten)
 binaryToIntervals :: String -> [Int]
 binaryToIntervals =
   map ((+ 1) . length) . tail . splitOn "1"
-
--- | Convert a list of intervals to a binary string.
---
--- >>> intervalsToBinary [2,3,4,3,4]
--- "1010010001001000"
-intervalsToBinary :: [Int] -> String
-intervalsToBinary =
-  concatMap (('1' :) . (`replicate` '0') . subtract 1)
-
--- | All binary necklaces with a given number of ones of a given length.
---
--- >>> necklacesPopCount 3 6
--- [[1,1,1,0,0,0],[1,1,0,1,0,0],[1,0,1,1,0,0],[1,0,1,0,1,0]]
-necklacesPopCount :: Int -> Int -> [[Int]]
-necklacesPopCount !m !n =
-  RSW.nodesToNecklaces n $
-    filter ((== m) . popCount) $
-      flatten (RSW.necklaces' n)
 
 data DeBruijnState = DeBruijnState
   { _seed :: [Int],
@@ -99,3 +81,21 @@ visit v =
     when isNew $
       seen %= Set.insert num
     pure isNew
+
+-- | Convert a list of intervals to a binary string.
+--
+-- >>> intervalsToBinary [2,3,4,3,4]
+-- "1010010001001000"
+intervalsToBinary :: [Int] -> String
+intervalsToBinary =
+  concatMap (('1' :) . (`replicate` '0') . subtract 1)
+
+-- | All binary necklaces with a given number of ones of a given length.
+--
+-- >>> necklacesPopCount 3 6
+-- [[1,1,1,0,0,0],[1,1,0,1,0,0],[1,0,1,1,0,0],[1,0,1,0,1,0]]
+necklacesPopCount :: Int -> Int -> [[Int]]
+necklacesPopCount !m !n =
+  RSW.nodesToNecklaces n $
+    filter ((== m) . popCount) $
+      flatten (RSW.necklaces' n)
