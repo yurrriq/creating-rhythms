@@ -1,7 +1,7 @@
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
 #include <math.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 /*
  *                            COPYRIGHT
@@ -42,22 +42,22 @@
 
 int main(int argc, char *argv[])
 {
-  if( argc < 3 )
-    {
-      printf("\nUsage: %s filename repeats\n", argv[0]);
-      printf("    filename - name of rhythm definition file\n");
-      printf("    repeats - number of times to repeat the rhythm\n");
-      return(-1);
-    }
+  if (argc < 3) {
+    printf("\nUsage: %s filename repeats\n", argv[0]);
+    printf("    filename - name of rhythm definition file\n");
+    printf("    repeats - number of times to repeat the rhythm\n");
+    return (-1);
+  }
 
   FILE *fp = fopen(argv[1], "r");
   int i, j, k, speed, nbeat, ndrum;
-  fscanf(fp,"%d %d %d", &speed, &nbeat, &ndrum);
-  int *drum = (int *)malloc(ndrum*sizeof(int));
-  char **pat = (char **)malloc(ndrum*sizeof(char *));
-  for(i=0; i<ndrum; ++i){
-    pat[i] = (char *)malloc(nbeat*sizeof(char));
-    fscanf(fp, "%d %s", drum+i, pat[i]);}
+  fscanf(fp, "%d %d %d", &speed, &nbeat, &ndrum);
+  int *drum = (int *)malloc(ndrum * sizeof(int));
+  char **pat = (char **)malloc(ndrum * sizeof(char *));
+  for (i = 0; i < ndrum; ++i) {
+    pat[i] = (char *)malloc(nbeat * sizeof(char));
+    fscanf(fp, "%d %s", drum + i, pat[i]);
+  }
   fclose(fp);
   int repeats = atoi(argv[2]);
 
@@ -70,26 +70,30 @@ int main(int argc, char *argv[])
   //  for(i=0; i<ndrum; ++i)
   //    printf("%d %s\n", drum[i], pat[i]);
 
-  char *beats = (char *)malloc(2*nbeat*sizeof(char));
+  char *beats = (char *)malloc(2 * nbeat * sizeof(char));
   char *pbeats;
   char note;
 
-  for(i=0; i<ndrum; ++i){
-    beats[0]='\0';
+  for (i = 0; i < ndrum; ++i) {
+    beats[0] = '\0';
     pbeats = beats;
-    printf("V:%d clef=perc\n", i+1);
+    printf("V:%d clef=perc\n", i + 1);
     printf("L: 1/4\n");
     printf("%%%%MIDI channel 10\n");
-    printf("%%%%MIDI drummap %c %d\n", 'A'+i, drum[i]);
-    for(j=0; j<nbeat;){
-      k=1;
-      note = pat[i][j] == '0' ? 'z' : 'A'+i;
-      while(pat[i][++j]!='1' && j<nbeat) ++k;
-      if(k==1)
-        pbeats += sprintf(pbeats,"%c", note);
+    printf("%%%%MIDI drummap %c %d\n", 'A' + i, drum[i]);
+    for (j = 0; j < nbeat;) {
+      k = 1;
+      note = pat[i][j] == '0' ? 'z' : 'A' + i;
+      while (pat[i][++j] != '1' && j < nbeat)
+        ++k;
+      if (k == 1)
+        pbeats += sprintf(pbeats, "%c", note);
       else
-        pbeats += sprintf(pbeats,"%c%d", note, k);}
-    for(j=0; j<repeats; ++j) printf("| %s ", beats);
-    printf("|\n");}
-  return(0);
+        pbeats += sprintf(pbeats, "%c%d", note, k);
+    }
+    for (j = 0; j < repeats; ++j)
+      printf("| %s ", beats);
+    printf("|\n");
+  }
+  return (0);
 }
