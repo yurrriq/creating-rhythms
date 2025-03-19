@@ -86,6 +86,7 @@
           ];
 
           nativeBuildInputs = with pkgs; [
+            abcmidi
             cabal-install
             ccls
             (
@@ -109,6 +110,7 @@
             myEmacs
             nixd
             rust-analyzer-nightly
+            timidity
           ];
         };
 
