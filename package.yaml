@@ -7,6 +7,10 @@ description: |-
 author: Eric Bailey
 maintainer: eric@ericb.me
 github: yurrriq/creating-rhythms
+extra-source-files:
+  - VERSION
+data-files:
+  examples/*.bdf
 dependencies:
   - base
 ghc-options:
@@ -23,10 +27,12 @@ library:
     - containers
     - extra
     - fast-digits
+    - finite-typelits
     - lens
     - mtl
     - random
     - recursion-schemes
+    - trifecta
 benchmarks:
   bench:
     ghc-options: -threaded -with-rtsopts=-N -O2
@@ -47,6 +53,13 @@ executables:
   b2int:
     <<: *executable
     main: b2int/Main.hs
+  bdrum:
+    <<: *executable
+    dependencies:
+      - CreatingRhythms
+      - optparse-applicative
+      - trifecta
+    main: bdrum/Main.hs
   cfcv:
     <<: *executable
     main: cfcv/Main.hs

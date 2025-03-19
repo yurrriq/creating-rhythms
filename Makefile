@@ -1,7 +1,7 @@
 .PRECIOUS: %.abc %.mid
 
 %.abc: %.bdf
-	./bdrum $< 4 >$@
+	cabal run bdrum $< 4 >$@
 
 %.mid: %.abc
 	abc2midi $< -o $@
