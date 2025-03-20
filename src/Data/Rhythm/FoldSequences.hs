@@ -1,3 +1,13 @@
+-- |
+-- Module      : Data.Rhythm.BDF
+-- Copyright   : (c) Eric Bailey, 2025
+--
+-- License     : MIT
+-- Maintainer  : eric@ericb.me
+-- Stability   : experimental
+-- Portability : POSIX
+--
+-- Fold sequences.
 module Data.Rhythm.FoldSequences
   ( foldSequence,
   )
@@ -6,7 +16,8 @@ where
 import Data.Bits (countTrailingZeros, shiftL, (.&.))
 import Data.Bool (bool)
 
--- | Generate fold sequences.
+-- | Generate fold sequences from given number of terms, number of bits, and
+-- function number \(\{0,\dotsc,2^m-1\}\).
 --
 -- >>> foldSequence 7 4 2
 -- [0,1,1,0,0,0,1]
