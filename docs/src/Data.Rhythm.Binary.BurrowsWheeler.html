@@ -22,7 +22,7 @@
 </span><span id="line-22"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="file:///home/yurrriq/.cabal/store/ghc-9.6.6/recursion-schemes-5.2.3-59d6a8a49972e2a4fa24fb073ee7f23ee68db39cd49c35394d3a2b202dd6f851/share/doc/html/src/Data.Functor.Base.html"><span class="hs-identifier">Data.Functor.Base</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="file:///home/yurrriq/.cabal/store/ghc-9.6.6/recursion-schemes-5.2.3-59d6a8a49972e2a4fa24fb073ee7f23ee68db39cd49c35394d3a2b202dd6f851/share/doc/html/src/Data.Functor.Base.html#ListF"><span class="hs-identifier">ListF</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">)</span><span>
 </span><span id="line-23"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="file:///home/yurrriq/.cabal/store/ghc-9.6.6/recursion-schemes-5.2.3-59d6a8a49972e2a4fa24fb073ee7f23ee68db39cd49c35394d3a2b202dd6f851/share/doc/html/src/Data.Functor.Foldable.html"><span class="hs-identifier">Data.Functor.Foldable</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="file:///home/yurrriq/.cabal/store/ghc-9.6.6/recursion-schemes-5.2.3-59d6a8a49972e2a4fa24fb073ee7f23ee68db39cd49c35394d3a2b202dd6f851/share/doc/html/src/Data.Functor.Foldable.html#ana"><span class="hs-identifier">ana</span></a></span><span class="hs-special">)</span><span>
 </span><span id="line-24"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.IntMap.Strict</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-operator">(!)</span></span><span class="hs-special">)</span><span>
-</span><span id="line-25"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Data.IntMap.Strict</span></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">IntMap</span></span><span>
+</span><span id="line-25"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.IntMap.Strict</span></span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">IntMap</span></span><span>
 </span><span id="line-26"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.List</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">elemIndices</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">sortOn</span></span><span class="hs-special">)</span><span>
 </span><span id="line-27"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="file:///home/yurrriq/.cabal/store/ghc-9.6.6/extra-1.8-e09eba2a1105d1f1e52cc5ddff8c02a6150c09ebdc78d13517061fbe14707f0c/share/doc/html/src/Data.List.Extra.html"><span class="hs-identifier">Data.List.Extra</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="file:///home/yurrriq/.cabal/store/ghc-9.6.6/extra-1.8-e09eba2a1105d1f1e52cc5ddff8c02a6150c09ebdc78d13517061fbe14707f0c/share/doc/html/src/Data.List.Extra.html#snoc"><span class="hs-identifier">snoc</span></a></span><span class="hs-special">)</span><span>
 </span><span id="line-28"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Ord</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Down</span></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">)</span><span>
@@ -33,8 +33,8 @@
 </span><span id="line-33"></span><span class="hs-comment">-- [[1,1,1,1],[1,1,1,0],[1,1,0,0],[1,0,1,0],[1,0,0,0],[0,0,0,0]]</span><span>
 </span><span id="line-34"></span><span class="annot"><a href="Data.Rhythm.Binary.BurrowsWheeler.html#necklaces"><span class="hs-identifier hs-type">necklaces</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">[</span><span class="hs-special">[</span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span class="hs-special">]</span><span class="hs-special">]</span><span>
 </span><span id="line-35"></span><span id="necklaces"><span class="annot"><span class="annottext">necklaces :: Int -&gt; [[Int]]
-</span><a href="Data.Rhythm.Binary.BurrowsWheeler.html#necklaces"><span class="hs-identifier hs-var hs-var">necklaces</span></a></span></span><span> </span><span id="local-6989586621679114193"><span class="annot"><span class="annottext">Int
-</span><a href="#local-6989586621679114193"><span class="hs-identifier hs-var">n</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><a href="Data.Rhythm.Binary.BurrowsWheeler.html#necklaces"><span class="hs-identifier hs-var hs-var">necklaces</span></a></span></span><span> </span><span id="local-6989586621679114215"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679114215"><span class="hs-identifier hs-var">n</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
 </span><span id="line-36"></span><span>  </span><span class="annot"><span class="annottext">([Int] -&gt; Down [Int]) -&gt; [[Int]] -&gt; [[Int]]
 forall b a. Ord b =&gt; (a -&gt; b) -&gt; [a] -&gt; [a]
 </span><span class="hs-identifier hs-var">sortOn</span></span><span> </span><span class="annot"><span class="annottext">[Int] -&gt; Down [Int]
@@ -51,7 +51,7 @@ forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
 </span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Int -&gt; [Int] -&gt; [Int]
 forall a. Int -&gt; [a] -&gt; [a]
 </span><span class="hs-identifier hs-var">take</span></span><span> </span><span class="annot"><span class="annottext">Int
-</span><a href="#local-6989586621679114193"><span class="hs-identifier hs-var">n</span></a></span><span> </span><span class="annot"><span class="annottext">([Int] -&gt; [Int]) -&gt; ([Int] -&gt; [Int]) -&gt; [Int] -&gt; [Int]
+</span><a href="#local-6989586621679114215"><span class="hs-identifier hs-var">n</span></a></span><span> </span><span class="annot"><span class="annottext">([Int] -&gt; [Int]) -&gt; ([Int] -&gt; [Int]) -&gt; [Int] -&gt; [Int]
 forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
 </span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">[Int] -&gt; [Int]
 forall a. HasCallStack =&gt; [a] -&gt; [a]
@@ -63,50 +63,48 @@ forall a. Ord a =&gt; [a] -&gt; Int -&gt; [[a]]
 </span><a href="Data.Rhythm.Binary.BurrowsWheeler.html#lyndonWords"><span class="hs-identifier hs-var">lyndonWords</span></a></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">Int
 </span><span class="hs-number">0</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Int
 </span><span class="hs-number">1</span></span><span class="hs-special">]</span><span> </span><span class="annot"><span class="annottext">Int
-</span><a href="#local-6989586621679114193"><span class="hs-identifier hs-var">n</span></a></span><span>
+</span><a href="#local-6989586621679114215"><span class="hs-identifier hs-var">n</span></a></span><span>
 </span><span id="line-39"></span><span>
 </span><span id="line-40"></span><span class="hs-comment">-- | The set of Lyndon words generated by an inverse Burrows-Wheeler transform.</span><span>
 </span><span id="line-41"></span><span class="hs-comment">--</span><span>
 </span><span id="line-42"></span><span class="hs-comment">-- &gt;&gt;&gt; lyndonWords [0,1] 4</span><span>
 </span><span id="line-43"></span><span class="hs-comment">-- [[0],[0,0,0,1],[0,0,1,1],[0,1],[0,1,1,1],[1]]</span><span>
-</span><span id="line-44"></span><span id="local-6989586621679114132"><span class="annot"><a href="Data.Rhythm.Binary.BurrowsWheeler.html#lyndonWords"><span class="hs-identifier hs-type">lyndonWords</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Ord</span></span><span> </span><span class="annot"><a href="#local-6989586621679114132"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="hs-special">[</span><span class="annot"><a href="#local-6989586621679114132"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">]</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">[</span><span class="hs-special">[</span><span class="annot"><a href="#local-6989586621679114132"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">]</span><span class="hs-special">]</span></span><span>
+</span><span id="line-44"></span><span id="local-6989586621679114156"><span class="annot"><a href="Data.Rhythm.Binary.BurrowsWheeler.html#lyndonWords"><span class="hs-identifier hs-type">lyndonWords</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Ord</span></span><span> </span><span class="annot"><a href="#local-6989586621679114156"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="hs-special">[</span><span class="annot"><a href="#local-6989586621679114156"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">]</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">[</span><span class="hs-special">[</span><span class="annot"><a href="#local-6989586621679114156"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">]</span><span class="hs-special">]</span></span><span>
 </span><span id="line-45"></span><span id="lyndonWords"><span class="annot"><span class="annottext">lyndonWords :: forall a. Ord a =&gt; [a] -&gt; Int -&gt; [[a]]
-</span><a href="Data.Rhythm.Binary.BurrowsWheeler.html#lyndonWords"><span class="hs-identifier hs-var hs-var">lyndonWords</span></a></span></span><span> </span><span id="local-6989586621679114206"><span class="annot"><span class="annottext">[a]
-</span><a href="#local-6989586621679114206"><span class="hs-identifier hs-var">s</span></a></span></span><span> </span><span id="local-6989586621679114207"><span class="annot"><span class="annottext">Int
-</span><a href="#local-6989586621679114207"><span class="hs-identifier hs-var">n</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Int -&gt; a) -&gt; [Int] -&gt; [a]
+</span><a href="Data.Rhythm.Binary.BurrowsWheeler.html#lyndonWords"><span class="hs-identifier hs-var hs-var">lyndonWords</span></a></span></span><span> </span><span id="local-6989586621679114228"><span class="annot"><span class="annottext">[a]
+</span><a href="#local-6989586621679114228"><span class="hs-identifier hs-var">s</span></a></span></span><span> </span><span id="local-6989586621679114229"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679114229"><span class="hs-identifier hs-var">n</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Int -&gt; a) -&gt; [Int] -&gt; [a]
 forall a b. (a -&gt; b) -&gt; [a] -&gt; [b]
 </span><span class="hs-identifier hs-var">map</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">[a]
-</span><a href="#local-6989586621679114208"><span class="hs-identifier hs-var">ref</span></a></span><span> </span><span class="annot"><span class="annottext">[a] -&gt; Int -&gt; a
-forall a. HasCallStack =&gt; [a] -&gt; Int -&gt; a
-</span><span class="hs-operator hs-var">!!</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">([Int] -&gt; [a]) -&gt; [[Int]] -&gt; [[a]]
+</span><a href="#local-6989586621679114230"><span class="hs-identifier hs-var">ref</span></a></span><span> </span><span class="hs-operator">!!</span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">([Int] -&gt; [a]) -&gt; [[Int]] -&gt; [[a]]
 forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
 </span><span class="hs-operator hs-var">&lt;$&gt;</span></span><span> </span><span class="annot"><span class="annottext">[Int] -&gt; [[Int]]
 </span><a href="Data.Rhythm.Binary.BurrowsWheeler.html#cycleForm"><span class="hs-identifier hs-var">cycleForm</span></a></span><span> </span><span class="annot"><span class="annottext">[Int]
-</span><a href="#local-6989586621679114211"><span class="hs-identifier hs-var">perm</span></a></span><span>
+</span><a href="#local-6989586621679114232"><span class="hs-identifier hs-var">perm</span></a></span><span>
 </span><span id="line-46"></span><span>  </span><span class="hs-keyword">where</span><span>
-</span><span id="line-47"></span><span>    </span><span id="local-6989586621679114208"><span class="annot"><span class="annottext">ref :: [a]
-</span><a href="#local-6989586621679114208"><span class="hs-identifier hs-var hs-var">ref</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; [a] -&gt; [a]
+</span><span id="line-47"></span><span>    </span><span id="local-6989586621679114230"><span class="annot"><span class="annottext">ref :: [a]
+</span><a href="#local-6989586621679114230"><span class="hs-identifier hs-var hs-var">ref</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; [a] -&gt; [a]
 forall a. Int -&gt; [a] -&gt; [a]
 </span><span class="hs-identifier hs-var">take</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">[a] -&gt; Int
 forall a. [a] -&gt; Int
 forall (t :: * -&gt; *) a. Foldable t =&gt; t a -&gt; Int
 </span><span class="hs-identifier hs-var">length</span></span><span> </span><span class="annot"><span class="annottext">[a]
-</span><a href="#local-6989586621679114206"><span class="hs-identifier hs-var">s</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+</span><a href="#local-6989586621679114228"><span class="hs-identifier hs-var">s</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
 forall a b. (Num a, Integral b) =&gt; a -&gt; b -&gt; a
 </span><span class="hs-operator hs-var">^</span></span><span> </span><span class="annot"><span class="annottext">Int
-</span><a href="#local-6989586621679114207"><span class="hs-identifier hs-var">n</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">[a] -&gt; [a]
+</span><a href="#local-6989586621679114229"><span class="hs-identifier hs-var">n</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">[a] -&gt; [a]
 forall a. HasCallStack =&gt; [a] -&gt; [a]
 </span><span class="hs-identifier hs-var">cycle</span></span><span> </span><span class="annot"><span class="annottext">[a]
-</span><a href="#local-6989586621679114206"><span class="hs-identifier hs-var">s</span></a></span><span class="hs-special">)</span><span>
-</span><span id="line-48"></span><span>    </span><span id="local-6989586621679114211"><span class="annot"><span class="annottext">perm :: [Int]
-</span><a href="#local-6989586621679114211"><span class="hs-identifier hs-var hs-var">perm</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[a]
-</span><a href="#local-6989586621679114206"><span class="hs-identifier hs-var">s</span></a></span><span> </span><span class="annot"><span class="annottext">[a] -&gt; (a -&gt; [Int]) -&gt; [Int]
+</span><a href="#local-6989586621679114228"><span class="hs-identifier hs-var">s</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-48"></span><span>    </span><span id="local-6989586621679114232"><span class="annot"><span class="annottext">perm :: [Int]
+</span><a href="#local-6989586621679114232"><span class="hs-identifier hs-var hs-var">perm</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[a]
+</span><a href="#local-6989586621679114228"><span class="hs-identifier hs-var">s</span></a></span><span> </span><span class="annot"><span class="annottext">[a] -&gt; (a -&gt; [Int]) -&gt; [Int]
 forall a b. [a] -&gt; (a -&gt; [b]) -&gt; [b]
 forall (m :: * -&gt; *) a b. Monad m =&gt; m a -&gt; (a -&gt; m b) -&gt; m b
 </span><span class="hs-operator hs-var">&gt;&gt;=</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">a -&gt; [a] -&gt; [Int]
 forall a. Eq a =&gt; a -&gt; [a] -&gt; [Int]
 </span><span class="hs-operator hs-var">`elemIndices`</span></span><span> </span><span class="annot"><span class="annottext">[a]
-</span><a href="#local-6989586621679114208"><span class="hs-identifier hs-var">ref</span></a></span><span class="hs-special">)</span><span>
+</span><a href="#local-6989586621679114230"><span class="hs-identifier hs-var">ref</span></a></span><span class="hs-special">)</span><span>
 </span><span id="line-49"></span><span>
 </span><span id="line-50"></span><span class="hs-comment">-- | Represent a permutation in a cycle notation.</span><span>
 </span><span id="line-51"></span><span class="hs-comment">--</span><span>
@@ -119,7 +117,7 @@ forall t a. Corecursive t =&gt; (a -&gt; Base t a) -&gt; a -&gt; t
 forall a. (a -&gt; Base [[Int]] a) -&gt; a -&gt; [[Int]]
 </span><a href="file:///home/yurrriq/.cabal/store/ghc-9.6.6/recursion-schemes-5.2.3-59d6a8a49972e2a4fa24fb073ee7f23ee68db39cd49c35394d3a2b202dd6f851/share/doc/html/src/Data.Functor.Foldable.html#ana"><span class="hs-identifier hs-var">ana</span></a></span><span> </span><span class="annot"><span class="annottext">IntMap Int -&gt; ListF [Int] (IntMap Int)
 IntMap Int -&gt; Base [[Int]] (IntMap Int)
-</span><a href="#local-6989586621679114224"><span class="hs-identifier hs-var">coalgebra</span></a></span><span> </span><span class="annot"><span class="annottext">(IntMap Int -&gt; [[Int]])
+</span><a href="#local-6989586621679114245"><span class="hs-identifier hs-var">coalgebra</span></a></span><span> </span><span class="annot"><span class="annottext">(IntMap Int -&gt; [[Int]])
 -&gt; ([Int] -&gt; IntMap Int) -&gt; [Int] -&gt; [[Int]]
 forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
 </span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">[(Int, Int)] -&gt; IntMap Int
@@ -132,8 +130,8 @@ forall a b. [a] -&gt; [b] -&gt; [(a, b)]
 </span><span class="hs-identifier hs-var">zip</span></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">Int
 </span><span class="hs-number">0</span></span><span> </span><span class="hs-glyph">..</span><span class="hs-special">]</span><span>
 </span><span id="line-56"></span><span>  </span><span class="hs-keyword">where</span><span>
-</span><span id="line-57"></span><span>    </span><span id="local-6989586621679114224"><span class="annot"><span class="annottext">coalgebra :: IntMap Int -&gt; ListF [Int] (IntMap Int)
-</span><a href="#local-6989586621679114224"><span class="hs-identifier hs-var hs-var">coalgebra</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">ListF [Int] (IntMap Int)
+</span><span id="line-57"></span><span>    </span><span id="local-6989586621679114245"><span class="annot"><span class="annottext">coalgebra :: IntMap Int -&gt; ListF [Int] (IntMap Int)
+</span><a href="#local-6989586621679114245"><span class="hs-identifier hs-var hs-var">coalgebra</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">ListF [Int] (IntMap Int)
 -&gt; (((Int, Int), IntMap Int) -&gt; ListF [Int] (IntMap Int))
 -&gt; Maybe ((Int, Int), IntMap Int)
 -&gt; ListF [Int] (IntMap Int)
@@ -141,7 +139,7 @@ forall b a. b -&gt; (a -&gt; b) -&gt; Maybe a -&gt; b
 </span><span class="hs-identifier hs-var">maybe</span></span><span> </span><span class="annot"><span class="annottext">ListF [Int] (IntMap Int)
 forall a b. ListF a b
 </span><a href="file:///home/yurrriq/.cabal/store/ghc-9.6.6/recursion-schemes-5.2.3-59d6a8a49972e2a4fa24fb073ee7f23ee68db39cd49c35394d3a2b202dd6f851/share/doc/html/src/Data.Functor.Base.html#Nil"><span class="hs-identifier hs-var">Nil</span></a></span><span> </span><span class="annot"><span class="annottext">((Int, Int), IntMap Int) -&gt; ListF [Int] (IntMap Int)
-</span><a href="#local-6989586621679114228"><span class="hs-identifier hs-var">makeCycle</span></a></span><span> </span><span class="annot"><span class="annottext">(Maybe ((Int, Int), IntMap Int) -&gt; ListF [Int] (IntMap Int))
+</span><a href="#local-6989586621679114249"><span class="hs-identifier hs-var">makeCycle</span></a></span><span> </span><span class="annot"><span class="annottext">(Maybe ((Int, Int), IntMap Int) -&gt; ListF [Int] (IntMap Int))
 -&gt; (IntMap Int -&gt; Maybe ((Int, Int), IntMap Int))
 -&gt; IntMap Int
 -&gt; ListF [Int] (IntMap Int)
@@ -149,28 +147,28 @@ forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
 </span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">IntMap Int -&gt; Maybe ((Int, Int), IntMap Int)
 forall a. IntMap a -&gt; Maybe ((Int, a), IntMap a)
 </span><span class="hs-identifier hs-var">IntMap.minViewWithKey</span></span><span>
-</span><span id="line-58"></span><span>    </span><span id="local-6989586621679114228"><span class="annot"><span class="annottext">makeCycle :: ((Int, Int), IntMap Int) -&gt; ListF [Int] (IntMap Int)
-</span><a href="#local-6989586621679114228"><span class="hs-identifier hs-var hs-var">makeCycle</span></a></span></span><span> </span><span class="hs-special">(</span><span class="hs-special">(</span><span id="local-6989586621679114233"><span class="annot"><span class="annottext">Int
-</span><a href="#local-6989586621679114233"><span class="hs-identifier hs-var">from</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679114234"><span class="annot"><span class="annottext">Int
-</span><a href="#local-6989586621679114234"><span class="hs-identifier hs-var">to</span></a></span></span><span class="hs-special">)</span><span class="hs-special">,</span><span> </span><span id="local-6989586621679114235"><span class="annot"><span class="annottext">IntMap Int
-</span><a href="#local-6989586621679114235"><span class="hs-identifier hs-var">perm</span></a></span></span><span class="hs-special">)</span><span>
+</span><span id="line-58"></span><span>    </span><span id="local-6989586621679114249"><span class="annot"><span class="annottext">makeCycle :: ((Int, Int), IntMap Int) -&gt; ListF [Int] (IntMap Int)
+</span><a href="#local-6989586621679114249"><span class="hs-identifier hs-var hs-var">makeCycle</span></a></span></span><span> </span><span class="hs-special">(</span><span class="hs-special">(</span><span id="local-6989586621679114254"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679114254"><span class="hs-identifier hs-var">from</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679114255"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679114255"><span class="hs-identifier hs-var">to</span></a></span></span><span class="hs-special">)</span><span class="hs-special">,</span><span> </span><span id="local-6989586621679114256"><span class="annot"><span class="annottext">IntMap Int
+</span><a href="#local-6989586621679114256"><span class="hs-identifier hs-var">perm</span></a></span></span><span class="hs-special">)</span><span>
 </span><span id="line-59"></span><span>      </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Int
-</span><a href="#local-6989586621679114233"><span class="hs-identifier hs-var">from</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Bool
+</span><a href="#local-6989586621679114254"><span class="hs-identifier hs-var">from</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Bool
 forall a. Eq a =&gt; a -&gt; a -&gt; Bool
 </span><span class="hs-operator hs-var">==</span></span><span> </span><span class="annot"><span class="annottext">Int
-</span><a href="#local-6989586621679114234"><span class="hs-identifier hs-var">to</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[Int] -&gt; IntMap Int -&gt; ListF [Int] (IntMap Int)
+</span><a href="#local-6989586621679114255"><span class="hs-identifier hs-var">to</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[Int] -&gt; IntMap Int -&gt; ListF [Int] (IntMap Int)
 forall a b. a -&gt; b -&gt; ListF a b
 </span><a href="file:///home/yurrriq/.cabal/store/ghc-9.6.6/recursion-schemes-5.2.3-59d6a8a49972e2a4fa24fb073ee7f23ee68db39cd49c35394d3a2b202dd6f851/share/doc/html/src/Data.Functor.Base.html#Cons"><span class="hs-identifier hs-var">Cons</span></a></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">Int
-</span><a href="#local-6989586621679114233"><span class="hs-identifier hs-var">from</span></a></span><span class="hs-special">]</span><span> </span><span class="annot"><span class="annottext">IntMap Int
-</span><a href="#local-6989586621679114235"><span class="hs-identifier hs-var">perm</span></a></span><span>
+</span><a href="#local-6989586621679114254"><span class="hs-identifier hs-var">from</span></a></span><span class="hs-special">]</span><span> </span><span class="annot"><span class="annottext">IntMap Int
+</span><a href="#local-6989586621679114256"><span class="hs-identifier hs-var">perm</span></a></span><span>
 </span><span id="line-60"></span><span>      </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Bool
 </span><span class="hs-identifier hs-var">otherwise</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[Int] -&gt; IntMap Int -&gt; ListF [Int] (IntMap Int)
 forall a b. a -&gt; b -&gt; ListF a b
 </span><a href="file:///home/yurrriq/.cabal/store/ghc-9.6.6/recursion-schemes-5.2.3-59d6a8a49972e2a4fa24fb073ee7f23ee68db39cd49c35394d3a2b202dd6f851/share/doc/html/src/Data.Functor.Base.html#Cons"><span class="hs-identifier hs-var">Cons</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">[Int] -&gt; Int -&gt; [Int]
 forall a. [a] -&gt; a -&gt; [a]
 </span><a href="file:///home/yurrriq/.cabal/store/ghc-9.6.6/extra-1.8-e09eba2a1105d1f1e52cc5ddff8c02a6150c09ebdc78d13517061fbe14707f0c/share/doc/html/src/Data.List.Extra.html#snoc"><span class="hs-identifier hs-var">snoc</span></a></span><span> </span><span class="annot"><span class="annottext">[Int]
-</span><a href="#local-6989586621679114237"><span class="hs-identifier hs-var">ciclo</span></a></span><span> </span><span class="annot"><span class="annottext">Int
-</span><a href="#local-6989586621679114233"><span class="hs-identifier hs-var">from</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(Int -&gt; IntMap Int -&gt; IntMap Int)
+</span><a href="#local-6989586621679114258"><span class="hs-identifier hs-var">ciclo</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679114254"><span class="hs-identifier hs-var">from</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(Int -&gt; IntMap Int -&gt; IntMap Int)
 -&gt; IntMap Int -&gt; [Int] -&gt; IntMap Int
 forall a b. (a -&gt; b -&gt; b) -&gt; b -&gt; [a] -&gt; b
 forall (t :: * -&gt; *) a b.
@@ -179,20 +177,18 @@ Foldable t =&gt;
 </span><span class="hs-identifier hs-var">foldr</span></span><span> </span><span class="annot"><span class="annottext">Int -&gt; IntMap Int -&gt; IntMap Int
 forall a. Int -&gt; IntMap a -&gt; IntMap a
 </span><span class="hs-identifier hs-var">IntMap.delete</span></span><span> </span><span class="annot"><span class="annottext">IntMap Int
-</span><a href="#local-6989586621679114235"><span class="hs-identifier hs-var">perm</span></a></span><span> </span><span class="annot"><span class="annottext">[Int]
-</span><a href="#local-6989586621679114237"><span class="hs-identifier hs-var">ciclo</span></a></span><span class="hs-special">)</span><span>
+</span><a href="#local-6989586621679114256"><span class="hs-identifier hs-var">perm</span></a></span><span> </span><span class="annot"><span class="annottext">[Int]
+</span><a href="#local-6989586621679114258"><span class="hs-identifier hs-var">ciclo</span></a></span><span class="hs-special">)</span><span>
 </span><span id="line-61"></span><span>      </span><span class="hs-keyword">where</span><span>
-</span><span id="line-62"></span><span>        </span><span id="local-6989586621679114237"><span class="annot"><span class="annottext">ciclo :: [Int]
-</span><a href="#local-6989586621679114237"><span class="hs-identifier hs-var hs-var">ciclo</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Int -&gt; Bool) -&gt; [Int] -&gt; [Int]
+</span><span id="line-62"></span><span>        </span><span id="local-6989586621679114258"><span class="annot"><span class="annottext">ciclo :: [Int]
+</span><a href="#local-6989586621679114258"><span class="hs-identifier hs-var hs-var">ciclo</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Int -&gt; Bool) -&gt; [Int] -&gt; [Int]
 forall a. (a -&gt; Bool) -&gt; [a] -&gt; [a]
 </span><span class="hs-identifier hs-var">takeWhile</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Bool
 forall a. Eq a =&gt; a -&gt; a -&gt; Bool
 </span><span class="hs-operator hs-var">/=</span></span><span> </span><span class="annot"><span class="annottext">Int
-</span><a href="#local-6989586621679114233"><span class="hs-identifier hs-var">from</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(Int -&gt; Int) -&gt; Int -&gt; [Int]
+</span><a href="#local-6989586621679114254"><span class="hs-identifier hs-var">from</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(Int -&gt; Int) -&gt; Int -&gt; [Int]
 forall a. (a -&gt; a) -&gt; a -&gt; [a]
 </span><span class="hs-identifier hs-var">iterate</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">IntMap Int
-</span><a href="#local-6989586621679114235"><span class="hs-identifier hs-var">perm</span></a></span><span> </span><span class="annot"><span class="annottext">IntMap Int -&gt; Int -&gt; Int
-forall a. IntMap a -&gt; Int -&gt; a
-</span><span class="hs-operator hs-var">!</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Int
-</span><a href="#local-6989586621679114234"><span class="hs-identifier hs-var">to</span></a></span><span class="hs-special">)</span><span>
+</span><a href="#local-6989586621679114256"><span class="hs-identifier hs-var">perm</span></a></span><span> </span><span class="hs-operator">!</span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679114255"><span class="hs-identifier hs-var">to</span></a></span><span class="hs-special">)</span><span>
 </span><span id="line-63"></span></pre></body></html>
