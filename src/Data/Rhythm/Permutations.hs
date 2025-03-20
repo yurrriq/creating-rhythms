@@ -10,7 +10,7 @@
 -- Strictly lexicographically larger permutations of a given list of numbers.
 module Data.Rhythm.Permutations where
 
-import qualified Data.List as List
+import Data.List qualified as List
 
 -- | Strictly lexicographically larger permutations of a given list of numbers.
 --

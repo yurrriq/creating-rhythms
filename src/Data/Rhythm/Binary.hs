@@ -1,7 +1,5 @@
-{-# LANGUAGE BangPatterns #-}
 {-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE TemplateHaskell #-}
-{-# LANGUAGE TypeApplications #-}
 
 -- |
 -- Module      : Data.Rhythm.Binary
@@ -29,9 +27,9 @@ import Control.Monad.State (State, evalState)
 import Data.Bits (popCount)
 import Data.FastDigits (undigits)
 import Data.List.Extra (snoc, splitOn)
-import qualified Data.Rhythm.Binary.RuskeySavageWang as RSW
+import Data.Rhythm.Binary.RuskeySavageWang qualified as RSW
 import Data.Set (Set)
-import qualified Data.Set as Set
+import Data.Set qualified as Set
 import Data.Tree (flatten)
 
 -- | Convert a binary string to a list of intervals.

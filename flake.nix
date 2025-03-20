@@ -14,15 +14,14 @@
       url = "github:nix-community/fenix";
     };
     flake-parts.url = "github:hercules-ci/flake-parts";
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-    nixpkgs-stable.url = "github:NixOS/nixpkgs/nixos-24.05";
-    pre-commit-hooks-nix = {
+    git-hooks-nix = {
       inputs = {
         nixpkgs.follows = "nixpkgs";
-        nixpkgs-stable.follows = "nixpkgs-stable";
       };
       url = "github:cachix/git-hooks.nix";
     };
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    nixpkgs-stable.url = "github:NixOS/nixpkgs/nixos-24.05";
     treefmt-nix = {
       inputs.nixpkgs.follows = "nixpkgs";
       url = "github:numtide/treefmt-nix";
@@ -54,7 +53,7 @@
       };
 
       imports = [
-        inputs.pre-commit-hooks-nix.flakeModule
+        inputs.git-hooks-nix.flakeModule
         inputs.treefmt-nix.flakeModule
       ];
 
@@ -62,7 +61,7 @@
         "x86_64-linux"
       ];
 
-      perSystem = { config, lib, pkgs, system, self', ... }: {
+      perSystem = { config, pkgs, system, self', ... }: {
         _module.args.pkgs = import nixpkgs {
           overlays = [
             inputs.emacs-overlay.overlay
@@ -79,8 +78,6 @@
             ];
           };
 
-          RUST_BACKTRACE = 1;
-
           inputsFrom = [
             config.pre-commit.devShell
           ];
@@ -89,16 +86,6 @@
             abcmidi
             cabal-install
             ccls
-            (
-              fenix.complete.withComponents [
-                "cargo"
-                "clippy"
-                "rust-src"
-                "rustc"
-                "rustfmt"
-              ]
-            )
-            gcc
             ghc
             ghcid
             haskell-language-server
@@ -109,7 +96,6 @@
             just
             myEmacs
             nixd
-            rust-analyzer-nightly
             timidity
           ];
         };
@@ -130,25 +116,21 @@
         };
 
         treefmt = {
-          projectRootFile = ./flake.nix;
           programs = {
             clang-format.enable = true;
             deadnix.enable = true;
             hlint.enable = true;
             nixpkgs-fmt.enable = true;
-            ormolu.enable = true;
-            rustfmt = {
+            ormolu = {
               enable = true;
-              package = pkgs.fenix.complete.rustfmt;
+              ghcOpts = [
+                "GHC2021"
+              ];
             };
           };
           settings.formatter = {
             clang-format.options = [
               "-style=file"
-            ];
-            rustfmt.options = lib.mkForce [
-              "--edition"
-              "2021"
             ];
           };
         };

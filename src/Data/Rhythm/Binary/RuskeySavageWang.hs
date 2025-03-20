@@ -1,4 +1,3 @@
-{-# LANGUAGE BangPatterns #-}
 {-# LANGUAGE UnicodeSyntax #-}
 
 -- |
@@ -27,7 +26,7 @@ where
 import Data.Bits (Bits (complementBit, rotateL, shiftL))
 import Data.FastDigits (digits)
 import Data.List (sortOn)
-import qualified Data.List.NonEmpty as NE
+import Data.List.NonEmpty qualified as NE
 import Data.Ord (Down (..))
 import Data.Tree (Tree (..), flatten, unfoldTree)
 

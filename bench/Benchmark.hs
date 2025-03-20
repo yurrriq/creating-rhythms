@@ -1,7 +1,7 @@
 import Criterion.Main (bench, bgroup, defaultMain, whnf)
 import Data.Functor ((<&>))
-import qualified Data.Rhythm.Binary.BurrowsWheeler as BW
-import qualified Data.Rhythm.Binary.RuskeySavageWang as RSW
+import Data.Rhythm.Binary.BurrowsWheeler qualified as BW
+import Data.Rhythm.Binary.RuskeySavageWang qualified as RSW
 import Text.Printf (printf)
 
 main :: IO ()

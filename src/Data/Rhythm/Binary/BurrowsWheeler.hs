@@ -22,7 +22,7 @@ where
 import Data.Functor.Base (ListF (..))
 import Data.Functor.Foldable (ana)
 import Data.IntMap.Strict ((!))
-import qualified Data.IntMap.Strict as IntMap
+import Data.IntMap.Strict qualified as IntMap
 import Data.List (elemIndices, sortOn)
 import Data.List.Extra (snoc)
 import Data.Ord (Down (..))

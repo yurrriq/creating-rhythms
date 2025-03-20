@@ -19,7 +19,7 @@ module Data.Rhythm.Partitions
 where
 
 import Math.Combinat.Partitions (Partition, fromPartition, partitionsWithKParts)
-import qualified Math.Combinat.Partitions as Partitions
+import Math.Combinat.Partitions qualified as Partitions
 
 -- | Partitions of a given number.
 --

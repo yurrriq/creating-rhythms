@@ -1,5 +1,5 @@
 import Control.Arrow ((&&&))
-import qualified Data.List.NonEmpty as NE
+import Data.List.NonEmpty qualified as NE
 import Data.Ratio (denominator, numerator)
 import Data.Rhythm.ContinuedFractions (ContinuedFraction (..), collapseFraction)
 import Options.Applicative

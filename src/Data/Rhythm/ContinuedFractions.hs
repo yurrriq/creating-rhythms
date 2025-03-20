@@ -1,5 +1,3 @@
-{-# LANGUAGE TypeApplications #-}
-
 -- |
 -- Module      : Data.Rhythm.ContinuedFractions
 -- Copyright   : (c) Eric Bailey, 2024-2025

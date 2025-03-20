@@ -14,7 +14,7 @@ import Data.Char (chr, ord)
 import Data.Finite (Finite, getFinite)
 import Data.List (intercalate)
 import Data.List.NonEmpty (NonEmpty (..))
-import qualified Data.List.NonEmpty as NE
+import Data.List.NonEmpty qualified as NE
 import Text.Printf (printf)
 import Text.Trifecta (Parser, char, count, natural, newline, skipOptional, some, (<?>))
 

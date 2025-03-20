@@ -7,6 +7,7 @@ description: |-
 author: Eric Bailey
 maintainer: eric@ericb.me
 github: yurrriq/creating-rhythms
+language: GHC2021
 extra-source-files:
   - VERSION
 data-files:
