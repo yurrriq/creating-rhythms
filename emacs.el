@@ -1,5 +1,3 @@
-;; See also: https://robert.kra.hn/posts/2021-02-07_rust-with-emacs/
-
 (column-number-mode 1)
 (menu-bar-mode 0)
 (scroll-bar-mode 0)
@@ -64,17 +62,13 @@
 (use-package lsp-mode
   :hook ((c-mode
           haskell-mode
-          nix-mode
-          rustic-mode)
+          nix-mode)
          . lsp-deferred)
   :commands (lsp lsp-deferred)
   :custom
   (lsp-eldoc-render-all t)
   (lsp-idle-delay 0.6)
   (lsp-modeline-code-actions-enable nil)
-  (lsp-rust-analyzer-cargo-watch-command "clippy")
-  (lsp-rust-analyzer-server-display-inlay-hints t)
-  (lsp-rust-server 'rust-analyzer)
   :config
   (advice-add 'lsp :before #'direnv-update-environment))
 
@@ -84,8 +78,7 @@
   :hook
   ((c-mode
     haskell-mode
-    nix-mode
-    rustic-mode)
+    nix-mode)
    . lsp-ui-mode)
   :custom
   (lsp-ui-peek-always-show t)
@@ -100,6 +93,10 @@
   (ccls-executable "ccls")
   (c-default-style "k&r")
   (c-basic-offset 2))
+
+(use-package multiple-cursors
+  :demand
+  :config (global-set-key (kbd "C-S-c C-S-c") 'mc/edit-lines))
 
 (use-package nix-mode)
 
@@ -134,41 +131,6 @@
 
 (use-package rainbow-delimiters
   :hook (prog-mode . rainbow-delimiters-mode))
-
-(defun yurrriq/rustic-mode-hook ()
-  ;; NOTE: https://github.com/brotzeit/rustic/issues/253
-  (when buffer-file-name
-    (setq-local buffer-save-without-query t)))
-
-(use-package rustic
-  :bind (:map rustic-mode-map
-              ("M-j" . lsp-ui-imenu)
-              ("M-?" . lsp-find-references)
-              ("C-c C-c l" . flycheck-list-errors)
-              ("C-c C-c a" . lsp-execute-code-action)
-              ("C-c C-c r" . lsp-rename)
-              ("C-c C-c q" . lsp-workspace-restart)
-              ("C-c C-c Q" . lsp-workspace-shutdown)
-              ("C-c C-c s" . lsp-rust-analyzer-status))
-  :hook (rustic-mode . yurrriq/rustic-mode-hook)
-  :config
-  (setq rustic-format-on-save t)
-  ;; https://rust-lang.github.io/rustfmt/
-  (dolist (item '(("blank_lines_upper_bound" . 2)
-                  ("combine_control_expr" . "false")
-                  ("comment_width" . 80)
-                  ("format_code_in_doc_comments" . "true")
-                  ("format_strings" . "true")
-                  ("group_imports" . "StdExternalCrate")
-                  ("imports_granularity" . "Module")
-                  ("match_block_trailing_comma" . "true")
-                  ("max_width" . 80)
-                  ("reorder_impl_items" . "true")
-                  ("space_before_colon" . "true")
-                  ("struct_field_align_threshold" . 20)
-                  ("use_try_shorthand" . "true")
-                  ("wrap_comments" . "true")))
-    (add-to-list 'rustic-rustfmt-config-alist item)))
 
 (use-package smex
   :demand
