@@ -86,6 +86,7 @@
             abcmidi
             cabal-install
             ccls
+            delta
             ghc
             ghcid
             haskell-language-server
