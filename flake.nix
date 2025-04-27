@@ -9,19 +9,13 @@
       };
       url = "github:nix-community/emacs-overlay";
     };
-    fenix = {
-      inputs.nixpkgs.follows = "nixpkgs";
-      url = "github:nix-community/fenix";
-    };
     flake-parts.url = "github:hercules-ci/flake-parts";
     git-hooks-nix = {
-      inputs = {
-        nixpkgs.follows = "nixpkgs";
-      };
+      inputs.nixpkgs.follows = "nixpkgs";
       url = "github:cachix/git-hooks.nix";
     };
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-    nixpkgs-stable.url = "github:NixOS/nixpkgs/nixos-24.05";
+    nixpkgs-stable.url = "github:NixOS/nixpkgs/nixos-24.11";
     treefmt-nix = {
       inputs.nixpkgs.follows = "nixpkgs";
       url = "github:numtide/treefmt-nix";
@@ -65,7 +59,6 @@
         _module.args.pkgs = import nixpkgs {
           overlays = [
             inputs.emacs-overlay.overlay
-            inputs.fenix.overlays.default
             self.overlays.default
           ];
           inherit system;
@@ -74,7 +67,7 @@
         devShells.default = pkgs.mkShell {
           FONTCONFIG_FILE = pkgs.makeFontsConf {
             fontDirectories = [
-              (pkgs.nerdfonts.override { fonts = [ "Iosevka" ]; })
+              pkgs.nerd-fonts.iosevka
             ];
           };
 

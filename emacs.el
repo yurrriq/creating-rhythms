@@ -100,22 +100,6 @@
 
 (use-package nix-mode)
 
-(eval-and-compile
-  (defun yurrriq/noweb-load-path ()
-    (file-name-as-directory
-      (expand-file-name "site-lisp"
-        (expand-file-name "emacs"
-          (expand-file-name "share"
-            (file-name-directory
-              (directory-file-name
-                (file-name-directory
-                  (executable-find "noweb"))))))))))
-
-(use-package noweb-mode
-  :load-path (lambda () (list (yurrriq/noweb-load-path)))
-  :mode ("\\.nw\\'")
-  :demand)
-
 (use-package nyan-mode
   :demand
   :config (nyan-mode 1))

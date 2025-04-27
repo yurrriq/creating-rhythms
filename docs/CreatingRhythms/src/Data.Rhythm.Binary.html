@@ -1,0 +1,326 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-pragma">{-# LANGUAGE LambdaCase #-}</span><span>
+</span><span id="line-2"></span><span class="hs-pragma">{-# LANGUAGE TemplateHaskell #-}</span><span>
+</span><span id="line-3"></span><span>
+</span><span id="line-4"></span><span class="hs-comment">-- |</span><span>
+</span><span id="line-5"></span><span class="hs-comment">-- Module      : Data.Rhythm.Binary</span><span>
+</span><span id="line-6"></span><span class="hs-comment">-- Copyright   : (c) Eric Bailey, 2024-2025</span><span>
+</span><span id="line-7"></span><span class="hs-comment">--</span><span>
+</span><span id="line-8"></span><span class="hs-comment">-- License     : MIT</span><span>
+</span><span id="line-9"></span><span class="hs-comment">-- Maintainer  : eric@ericb.me</span><span>
+</span><span id="line-10"></span><span class="hs-comment">-- Stability   : experimental</span><span>
+</span><span id="line-11"></span><span class="hs-comment">-- Portability : POSIX</span><span>
+</span><span id="line-12"></span><span class="hs-comment">--</span><span>
+</span><span id="line-13"></span><span class="hs-comment">-- De Bruijn sequences, and conversion between binary strings and lists of</span><span>
+</span><span id="line-14"></span><span class="hs-comment">-- intervals.</span><span>
+</span><span id="line-15"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Data.Rhythm.Binary</span><span>
+</span><span id="line-16"></span><span>  </span><span class="hs-special">(</span><span> </span><span class="annot"><a href="Data.Rhythm.Binary.html#binaryToIntervals"><span class="hs-identifier">binaryToIntervals</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-17"></span><span>    </span><span class="annot"><a href="Data.Rhythm.Binary.html#deBruijnSequence"><span class="hs-identifier">deBruijnSequence</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-18"></span><span>    </span><span class="annot"><a href="Data.Rhythm.Binary.html#intervalsToBinary"><span class="hs-identifier">intervalsToBinary</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-19"></span><span>    </span><span class="annot"><a href="Data.Rhythm.Binary.RuskeySavageWang.html#necklaces"><span class="hs-identifier">RSW.necklaces</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-20"></span><span>    </span><span class="annot"><a href="Data.Rhythm.Binary.html#necklacesPopCount"><span class="hs-identifier">necklacesPopCount</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-21"></span><span>  </span><span class="hs-special">)</span><span>
+</span><span id="line-22"></span><span class="hs-keyword">where</span><span>
+</span><span id="line-23"></span><span>
+</span><span id="line-24"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="file:///home/yurrriq/.cabal/store/ghc-9.6.6/lens-5.3.3-d6153c0f37f97a6d1062d0cb15d1fbfa8e82ea08fcf9c8a77481c31f0573f21b/share/doc/html/src/Control.Lens.html"><span class="hs-identifier">Control.Lens</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="file:///home/yurrriq/.cabal/store/ghc-9.6.6/lens-5.3.3-d6153c0f37f97a6d1062d0cb15d1fbfa8e82ea08fcf9c8a77481c31f0573f21b/share/doc/html/src/Control.Lens.TH.html#makeLenses"><span class="hs-identifier">makeLenses</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="file:///home/yurrriq/.cabal/store/ghc-9.6.6/lens-5.3.3-d6153c0f37f97a6d1062d0cb15d1fbfa8e82ea08fcf9c8a77481c31f0573f21b/share/doc/html/src/Control.Lens.Getter.html#uses"><span class="hs-identifier">uses</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="file:///home/yurrriq/.cabal/store/ghc-9.6.6/lens-5.3.3-d6153c0f37f97a6d1062d0cb15d1fbfa8e82ea08fcf9c8a77481c31f0573f21b/share/doc/html/src/Control.Lens.Setter.html#%25%3D"><span class="hs-operator">(%=)</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-25"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Control.Monad</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">when</span></span><span class="hs-special">)</span><span>
+</span><span id="line-26"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Control.Monad.State</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">State</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">evalState</span></span><span class="hs-special">)</span><span>
+</span><span id="line-27"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Bits</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">popCount</span></span><span class="hs-special">)</span><span>
+</span><span id="line-28"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="file:///home/yurrriq/.cabal/store/ghc-9.6.6/fast-digits-0.3.2.0-a2bc7e152e5233bd88f98e54004eb1aef5407336fd0c8ee19ace7fe19ac5c258/share/doc/html/src/Data.FastDigits.html"><span class="hs-identifier">Data.FastDigits</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="file:///home/yurrriq/.cabal/store/ghc-9.6.6/fast-digits-0.3.2.0-a2bc7e152e5233bd88f98e54004eb1aef5407336fd0c8ee19ace7fe19ac5c258/share/doc/html/src/Data.FastDigits.html#undigits"><span class="hs-identifier">undigits</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-29"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="file:///home/yurrriq/.cabal/store/ghc-9.6.6/extra-1.8-0b017c03e33668e91dd409f32b2e04807aa474384c811fa2927fdccefdbfffe4/share/doc/html/src/Data.List.Extra.html"><span class="hs-identifier">Data.List.Extra</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="file:///home/yurrriq/.cabal/store/ghc-9.6.6/extra-1.8-0b017c03e33668e91dd409f32b2e04807aa474384c811fa2927fdccefdbfffe4/share/doc/html/src/Data.List.Extra.html#snoc"><span class="hs-identifier">snoc</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="file:///home/yurrriq/.cabal/store/ghc-9.6.6/extra-1.8-0b017c03e33668e91dd409f32b2e04807aa474384c811fa2927fdccefdbfffe4/share/doc/html/src/Data.List.Extra.html#splitOn"><span class="hs-identifier">splitOn</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-30"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="Data.Rhythm.Binary.RuskeySavageWang.html"><span class="hs-identifier">Data.Rhythm.Binary.RuskeySavageWang</span></a></span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">RSW</span></span><span>
+</span><span id="line-31"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Set</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Set</span></span><span class="hs-special">)</span><span>
+</span><span id="line-32"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Set</span></span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">Set</span></span><span>
+</span><span id="line-33"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Tree</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">flatten</span></span><span class="hs-special">)</span><span>
+</span><span id="line-34"></span><span>
+</span><span id="line-35"></span><span class="hs-comment">-- | Convert a binary string to a list of intervals.</span><span>
+</span><span id="line-36"></span><span class="hs-comment">--</span><span>
+</span><span id="line-37"></span><span class="hs-comment">-- &gt;&gt;&gt; binaryToIntervals &quot;1010010001001000&quot;</span><span>
+</span><span id="line-38"></span><span class="hs-comment">-- [2,3,4,3,4]</span><span>
+</span><span id="line-39"></span><span class="annot"><a href="Data.Rhythm.Binary.html#binaryToIntervals"><span class="hs-identifier hs-type">binaryToIntervals</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">[</span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span class="hs-special">]</span><span>
+</span><span id="line-40"></span><span id="binaryToIntervals"><span class="annot"><span class="annottext">binaryToIntervals :: [Char] -&gt; [Int]
+</span><a href="Data.Rhythm.Binary.html#binaryToIntervals"><span class="hs-identifier hs-var hs-var">binaryToIntervals</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-41"></span><span>  </span><span class="annot"><span class="annottext">([Char] -&gt; Int) -&gt; [[Char]] -&gt; [Int]
+forall a b. (a -&gt; b) -&gt; [a] -&gt; [b]
+</span><span class="hs-identifier hs-var">map</span></span><span> </span><span class="hs-special">(</span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">+</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">1</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">(Int -&gt; Int) -&gt; ([Char] -&gt; Int) -&gt; [Char] -&gt; Int
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">[Char] -&gt; Int
+forall a. [a] -&gt; Int
+forall (t :: * -&gt; *) a. Foldable t =&gt; t a -&gt; Int
+</span><span class="hs-identifier hs-var">length</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">([[Char]] -&gt; [Int]) -&gt; ([Char] -&gt; [[Char]]) -&gt; [Char] -&gt; [Int]
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">[[Char]] -&gt; [[Char]]
+forall a. HasCallStack =&gt; [a] -&gt; [a]
+</span><span class="hs-identifier hs-var">tail</span></span><span> </span><span class="annot"><span class="annottext">([[Char]] -&gt; [[Char]])
+-&gt; ([Char] -&gt; [[Char]]) -&gt; [Char] -&gt; [[Char]]
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">[Char] -&gt; [Char] -&gt; [[Char]]
+forall a. (HasCallStack, Eq a) =&gt; [a] -&gt; [a] -&gt; [[a]]
+</span><a href="file:///home/yurrriq/.cabal/store/ghc-9.6.6/extra-1.8-0b017c03e33668e91dd409f32b2e04807aa474384c811fa2927fdccefdbfffe4/share/doc/html/src/Data.List.Extra.html#splitOn"><span class="hs-identifier hs-var">splitOn</span></a></span><span> </span><span class="annot"><span class="annottext">[Char]
+</span><span class="hs-string">&quot;1&quot;</span></span><span>
+</span><span id="line-42"></span><span>
+</span><span id="line-43"></span><span class="hs-keyword">data</span><span> </span><span id="DeBruijnState"><span class="annot"><a href="Data.Rhythm.Binary.html#DeBruijnState"><span class="hs-identifier hs-var">DeBruijnState</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="DeBruijnState"><span class="annot"><a href="Data.Rhythm.Binary.html#DeBruijnState"><span class="hs-identifier hs-var">DeBruijnState</span></a></span></span><span>
+</span><span id="line-44"></span><span>  </span><span class="hs-special">{</span><span> </span><span id="_seed"><span class="annot"><span class="annottext">DeBruijnState -&gt; [Int]
+</span><a href="Data.Rhythm.Binary.html#_seed"><span class="hs-identifier hs-var hs-var">_seed</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">[</span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span class="hs-special">]</span><span class="hs-special">,</span><span>
+</span><span id="line-45"></span><span>    </span><span id="_seen"><span class="annot"><span class="annottext">DeBruijnState -&gt; Set Integer
+</span><a href="Data.Rhythm.Binary.html#_seen"><span class="hs-identifier hs-var hs-var">_seen</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Set</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Integer</span></span><span>
+</span><span id="line-46"></span><span>  </span><span class="hs-special">}</span><span>
+</span><span id="line-47"></span><span>
+</span><span id="line-48"></span><span id="seed"><span id="seen"><span class="hs-identifier">makeLenses</span><span> </span><span class="hs-special">''</span><span class="hs-identifier">DeBruijnState</span></span></span><span>
+</span><span id="line-49"></span><span>
+</span><span id="line-50"></span><span class="annot"><a href="Data.Rhythm.Binary.html#mkDeBruijnState"><span class="hs-identifier hs-type">mkDeBruijnState</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Data.Rhythm.Binary.html#DeBruijnState"><span class="hs-identifier hs-type">DeBruijnState</span></a></span><span>
+</span><span id="line-51"></span><span id="mkDeBruijnState"><span class="annot"><span class="annottext">mkDeBruijnState :: Int -&gt; DeBruijnState
+</span><a href="Data.Rhythm.Binary.html#mkDeBruijnState"><span class="hs-identifier hs-var hs-var">mkDeBruijnState</span></a></span></span><span> </span><span id="local-6989586621679114994"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679114994"><span class="hs-identifier hs-var">n</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[Int] -&gt; Set Integer -&gt; DeBruijnState
+</span><a href="Data.Rhythm.Binary.html#DeBruijnState"><span class="hs-identifier hs-var">DeBruijnState</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; [Int]
+forall a. Int -&gt; a -&gt; [a]
+</span><span class="hs-identifier hs-var">replicate</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679114994"><span class="hs-identifier hs-var">n</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Set Integer
+forall a. Set a
+</span><span class="hs-identifier hs-var">Set.empty</span></span><span>
+</span><span id="line-52"></span><span>
+</span><span id="line-53"></span><span class="hs-comment">-- | Generate the largest de Bruijn sequence of a given order.</span><span>
+</span><span id="line-54"></span><span class="hs-comment">--</span><span>
+</span><span id="line-55"></span><span class="hs-comment">-- Based on http://debruijnsequence.org/db/greedy.</span><span>
+</span><span id="line-56"></span><span class="hs-comment">--</span><span>
+</span><span id="line-57"></span><span class="hs-comment">-- &gt;&gt;&gt; deBruijnSequence 4</span><span>
+</span><span id="line-58"></span><span class="hs-comment">-- [1,1,1,1,0,1,1,0,0,1,0,1,0,0,0,0]</span><span>
+</span><span id="line-59"></span><span class="annot"><a href="Data.Rhythm.Binary.html#deBruijnSequence"><span class="hs-identifier hs-type">deBruijnSequence</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">[</span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span class="hs-special">]</span><span>
+</span><span id="line-60"></span><span id="deBruijnSequence"><span class="annot"><span class="annottext">deBruijnSequence :: Int -&gt; [Int]
+</span><a href="Data.Rhythm.Binary.html#deBruijnSequence"><span class="hs-identifier hs-var hs-var">deBruijnSequence</span></a></span></span><span> </span><span id="local-6989586621679114997"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679114997"><span class="hs-identifier hs-var">n</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">State DeBruijnState [Int] -&gt; DeBruijnState -&gt; [Int]
+forall s a. State s a -&gt; s -&gt; a
+</span><span class="hs-identifier hs-var">evalState</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">[Int] -&gt; State DeBruijnState [Int]
+</span><a href="#local-6989586621679114998"><span class="hs-identifier hs-var">outer</span></a></span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int -&gt; DeBruijnState
+</span><a href="Data.Rhythm.Binary.html#mkDeBruijnState"><span class="hs-identifier hs-var">mkDeBruijnState</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679114997"><span class="hs-identifier hs-var">n</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-61"></span><span>  </span><span class="hs-keyword">where</span><span>
+</span><span id="line-62"></span><span>    </span><span id="local-6989586621679114998"><span class="annot"><span class="annottext">outer :: [Int] -&gt; State DeBruijnState [Int]
+</span><a href="#local-6989586621679114998"><span class="hs-identifier hs-var hs-var">outer</span></a></span></span><span> </span><span id="local-6989586621679115008"><span class="annot"><span class="annottext">[Int]
+</span><a href="#local-6989586621679115008"><span class="hs-identifier hs-var">neck</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-63"></span><span>      </span><span class="hs-keyword">do</span><span>
+</span><span id="line-64"></span><span>        </span><span class="annot"><span class="annottext">([Int] -&gt; Identity [Int])
+-&gt; DeBruijnState -&gt; Identity DeBruijnState
+Lens' DeBruijnState [Int]
+</span><a href="Data.Rhythm.Binary.html#seed"><span class="hs-identifier hs-var">seed</span></a></span><span> </span><span class="annot"><span class="annottext">(([Int] -&gt; Identity [Int])
+ -&gt; DeBruijnState -&gt; Identity DeBruijnState)
+-&gt; ([Int] -&gt; [Int]) -&gt; StateT DeBruijnState Identity ()
+forall s (m :: * -&gt; *) a b.
+MonadState s m =&gt;
+ASetter s s a b -&gt; (a -&gt; b) -&gt; m ()
+</span><a href="file:///home/yurrriq/.cabal/store/ghc-9.6.6/lens-5.3.3-d6153c0f37f97a6d1062d0cb15d1fbfa8e82ea08fcf9c8a77481c31f0573f21b/share/doc/html/src/Control.Lens.Setter.html#%25%3D"><span class="hs-operator hs-var">%=</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">([Int] -&gt; Int -&gt; [Int]) -&gt; Int -&gt; [Int] -&gt; [Int]
+forall a b c. (a -&gt; b -&gt; c) -&gt; b -&gt; a -&gt; c
+</span><span class="hs-identifier hs-var">flip</span></span><span> </span><span class="annot"><span class="annottext">[Int] -&gt; Int -&gt; [Int]
+forall a. [a] -&gt; a -&gt; [a]
+</span><a href="file:///home/yurrriq/.cabal/store/ghc-9.6.6/extra-1.8-0b017c03e33668e91dd409f32b2e04807aa474384c811fa2927fdccefdbfffe4/share/doc/html/src/Data.List.Extra.html#snoc"><span class="hs-identifier hs-var">snoc</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0</span></span><span> </span><span class="annot"><span class="annottext">([Int] -&gt; [Int]) -&gt; ([Int] -&gt; [Int]) -&gt; [Int] -&gt; [Int]
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">[Int] -&gt; [Int]
+forall a. HasCallStack =&gt; [a] -&gt; [a]
+</span><span class="hs-identifier hs-var">tail</span></span><span class="hs-special">)</span><span>
+</span><span id="line-65"></span><span>        </span><span class="annot"><span class="annottext">Int -&gt; [Int] -&gt; StateT DeBruijnState Identity (Maybe [Int])
+</span><a href="#local-6989586621679115010"><span class="hs-identifier hs-var">inner</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">1</span></span><span> </span><span class="annot"><span class="annottext">[Int]
+</span><a href="#local-6989586621679115008"><span class="hs-identifier hs-var">neck</span></a></span><span> </span><span class="annot"><span class="annottext">StateT DeBruijnState Identity (Maybe [Int])
+-&gt; (Maybe [Int] -&gt; State DeBruijnState [Int])
+-&gt; State DeBruijnState [Int]
+forall a b.
+StateT DeBruijnState Identity a
+-&gt; (a -&gt; StateT DeBruijnState Identity b)
+-&gt; StateT DeBruijnState Identity b
+forall (m :: * -&gt; *) a b. Monad m =&gt; m a -&gt; (a -&gt; m b) -&gt; m b
+</span><span class="hs-operator hs-var">&gt;&gt;=</span></span><span> </span><span class="annot"><span class="annottext">State DeBruijnState [Int]
+-&gt; ([Int] -&gt; State DeBruijnState [Int])
+-&gt; Maybe [Int]
+-&gt; State DeBruijnState [Int]
+forall b a. b -&gt; (a -&gt; b) -&gt; Maybe a -&gt; b
+</span><span class="hs-identifier hs-var">maybe</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">[Int] -&gt; State DeBruijnState [Int]
+forall a. a -&gt; StateT DeBruijnState Identity a
+forall (f :: * -&gt; *) a. Applicative f =&gt; a -&gt; f a
+</span><span class="hs-identifier hs-var">pure</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">[Int] -&gt; [Int]
+forall a. [a] -&gt; [a]
+</span><span class="hs-identifier hs-var">reverse</span></span><span> </span><span class="annot"><span class="annottext">[Int]
+</span><a href="#local-6989586621679115008"><span class="hs-identifier hs-var">neck</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">[Int] -&gt; State DeBruijnState [Int]
+</span><a href="#local-6989586621679114998"><span class="hs-identifier hs-var">outer</span></a></span><span>
+</span><span id="line-66"></span><span>
+</span><span id="line-67"></span><span>    </span><span id="local-6989586621679115010"><span class="annot"><span class="annottext">inner :: Int -&gt; [Int] -&gt; StateT DeBruijnState Identity (Maybe [Int])
+</span><a href="#local-6989586621679115010"><span class="hs-identifier hs-var hs-var">inner</span></a></span></span><span> </span><span id="local-6989586621679115023"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679115023"><span class="hs-identifier hs-var">i</span></a></span></span><span> </span><span id="local-6989586621679115024"><span class="annot"><span class="annottext">[Int]
+</span><a href="#local-6989586621679115024"><span class="hs-identifier hs-var">neck</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-68"></span><span>      </span><span class="annot"><span class="annottext">Int -&gt; State DeBruijnState Bool
+</span><a href="Data.Rhythm.Binary.html#visit"><span class="hs-identifier hs-var">visit</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679115023"><span class="hs-identifier hs-var">i</span></a></span><span> </span><span class="annot"><span class="annottext">State DeBruijnState Bool
+-&gt; (Bool -&gt; StateT DeBruijnState Identity (Maybe [Int]))
+-&gt; StateT DeBruijnState Identity (Maybe [Int])
+forall a b.
+StateT DeBruijnState Identity a
+-&gt; (a -&gt; StateT DeBruijnState Identity b)
+-&gt; StateT DeBruijnState Identity b
+forall (m :: * -&gt; *) a b. Monad m =&gt; m a -&gt; (a -&gt; m b) -&gt; m b
+</span><span class="hs-operator hs-var">&gt;&gt;=</span></span><span> </span><span class="hs-glyph">\</span><span class="hs-glyph">case</span><span>
+</span><span id="line-69"></span><span>        </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">True</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Maybe [Int] -&gt; StateT DeBruijnState Identity (Maybe [Int])
+forall a. a -&gt; StateT DeBruijnState Identity a
+forall (f :: * -&gt; *) a. Applicative f =&gt; a -&gt; f a
+</span><span class="hs-identifier hs-var">pure</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">[Int] -&gt; Maybe [Int]
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679115023"><span class="hs-identifier hs-var">i</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; [Int] -&gt; [Int]
+forall a. a -&gt; [a] -&gt; [a]
+</span><span class="hs-glyph hs-var">:</span></span><span> </span><span class="annot"><span class="annottext">[Int]
+</span><a href="#local-6989586621679115024"><span class="hs-identifier hs-var">neck</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-70"></span><span>        </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">False</span></span><span> </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679115023"><span class="hs-identifier hs-var">i</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Bool
+forall a. Ord a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">&gt;</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Int -&gt; [Int] -&gt; StateT DeBruijnState Identity (Maybe [Int])
+</span><a href="#local-6989586621679115010"><span class="hs-identifier hs-var">inner</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679115023"><span class="hs-identifier hs-var">i</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-glyph hs-var">-</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">1</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">[Int]
+</span><a href="#local-6989586621679115024"><span class="hs-identifier hs-var">neck</span></a></span><span>
+</span><span id="line-71"></span><span>        </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">False</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Maybe [Int] -&gt; StateT DeBruijnState Identity (Maybe [Int])
+forall a. a -&gt; StateT DeBruijnState Identity a
+forall (f :: * -&gt; *) a. Applicative f =&gt; a -&gt; f a
+</span><span class="hs-identifier hs-var">pure</span></span><span> </span><span class="annot"><span class="annottext">Maybe [Int]
+forall a. Maybe a
+</span><span class="hs-identifier hs-var">Nothing</span></span><span>
+</span><span id="line-72"></span><span>
+</span><span id="line-73"></span><span class="annot"><a href="Data.Rhythm.Binary.html#visit"><span class="hs-identifier hs-type">visit</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">State</span></span><span> </span><span class="annot"><a href="Data.Rhythm.Binary.html#DeBruijnState"><span class="hs-identifier hs-type">DeBruijnState</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Bool</span></span><span>
+</span><span id="line-74"></span><span id="visit"><span class="annot"><span class="annottext">visit :: Int -&gt; State DeBruijnState Bool
+</span><a href="Data.Rhythm.Binary.html#visit"><span class="hs-identifier hs-var hs-var">visit</span></a></span></span><span> </span><span id="local-6989586621679115027"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679115027"><span class="hs-identifier hs-var">v</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-75"></span><span>  </span><span class="hs-keyword">do</span><span>
+</span><span id="line-76"></span><span>    </span><span class="annot"><span class="annottext">([Int] -&gt; Identity [Int])
+-&gt; DeBruijnState -&gt; Identity DeBruijnState
+Lens' DeBruijnState [Int]
+</span><a href="Data.Rhythm.Binary.html#seed"><span class="hs-identifier hs-var">seed</span></a></span><span> </span><span class="annot"><span class="annottext">(([Int] -&gt; Identity [Int])
+ -&gt; DeBruijnState -&gt; Identity DeBruijnState)
+-&gt; ([Int] -&gt; [Int]) -&gt; StateT DeBruijnState Identity ()
+forall s (m :: * -&gt; *) a b.
+MonadState s m =&gt;
+ASetter s s a b -&gt; (a -&gt; b) -&gt; m ()
+</span><a href="file:///home/yurrriq/.cabal/store/ghc-9.6.6/lens-5.3.3-d6153c0f37f97a6d1062d0cb15d1fbfa8e82ea08fcf9c8a77481c31f0573f21b/share/doc/html/src/Control.Lens.Setter.html#%25%3D"><span class="hs-operator hs-var">%=</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">([Int] -&gt; Int -&gt; [Int]) -&gt; Int -&gt; [Int] -&gt; [Int]
+forall a b c. (a -&gt; b -&gt; c) -&gt; b -&gt; a -&gt; c
+</span><span class="hs-identifier hs-var">flip</span></span><span> </span><span class="annot"><span class="annottext">[Int] -&gt; Int -&gt; [Int]
+forall a. [a] -&gt; a -&gt; [a]
+</span><a href="file:///home/yurrriq/.cabal/store/ghc-9.6.6/extra-1.8-0b017c03e33668e91dd409f32b2e04807aa474384c811fa2927fdccefdbfffe4/share/doc/html/src/Data.List.Extra.html#snoc"><span class="hs-identifier hs-var">snoc</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679115027"><span class="hs-identifier hs-var">v</span></a></span><span> </span><span class="annot"><span class="annottext">([Int] -&gt; [Int]) -&gt; ([Int] -&gt; [Int]) -&gt; [Int] -&gt; [Int]
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">[Int] -&gt; [Int]
+forall a. HasCallStack =&gt; [a] -&gt; [a]
+</span><span class="hs-identifier hs-var">init</span></span><span class="hs-special">)</span><span>
+</span><span id="line-77"></span><span>    </span><span id="local-6989586621679115029"><span class="annot"><span class="annottext">Integer
+</span><a href="#local-6989586621679115029"><span class="hs-identifier hs-var">num</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">LensLike' (Const Integer) DeBruijnState [Int]
+-&gt; ([Int] -&gt; Integer) -&gt; StateT DeBruijnState Identity Integer
+forall s (m :: * -&gt; *) r a.
+MonadState s m =&gt;
+LensLike' (Const r) s a -&gt; (a -&gt; r) -&gt; m r
+</span><a href="file:///home/yurrriq/.cabal/store/ghc-9.6.6/lens-5.3.3-d6153c0f37f97a6d1062d0cb15d1fbfa8e82ea08fcf9c8a77481c31f0573f21b/share/doc/html/src/Control.Lens.Getter.html#uses"><span class="hs-identifier hs-var">uses</span></a></span><span> </span><span class="annot"><span class="annottext">LensLike' (Const Integer) DeBruijnState [Int]
+Lens' DeBruijnState [Int]
+</span><a href="Data.Rhythm.Binary.html#seed"><span class="hs-identifier hs-var">seed</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">forall a b. (Integral a, Integral b) =&gt; a -&gt; [b] -&gt; Integer
+</span><a href="file:///home/yurrriq/.cabal/store/ghc-9.6.6/fast-digits-0.3.2.0-a2bc7e152e5233bd88f98e54004eb1aef5407336fd0c8ee19ace7fe19ac5c258/share/doc/html/src/Data.FastDigits.html#undigits"><span class="hs-identifier hs-var">undigits</span></a></span><span> </span><span class="hs-glyph">@</span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">2</span></span><span class="hs-special">)</span><span>
+</span><span id="line-78"></span><span>    </span><span id="local-6989586621679115030"><span class="annot"><span class="annottext">Bool
+</span><a href="#local-6989586621679115030"><span class="hs-identifier hs-var">isNew</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">LensLike' (Const Bool) DeBruijnState (Set Integer)
+-&gt; (Set Integer -&gt; Bool) -&gt; State DeBruijnState Bool
+forall s (m :: * -&gt; *) r a.
+MonadState s m =&gt;
+LensLike' (Const r) s a -&gt; (a -&gt; r) -&gt; m r
+</span><a href="file:///home/yurrriq/.cabal/store/ghc-9.6.6/lens-5.3.3-d6153c0f37f97a6d1062d0cb15d1fbfa8e82ea08fcf9c8a77481c31f0573f21b/share/doc/html/src/Control.Lens.Getter.html#uses"><span class="hs-identifier hs-var">uses</span></a></span><span> </span><span class="annot"><span class="annottext">LensLike' (Const Bool) DeBruijnState (Set Integer)
+Lens' DeBruijnState (Set Integer)
+</span><a href="Data.Rhythm.Binary.html#seen"><span class="hs-identifier hs-var">seen</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Integer -&gt; Set Integer -&gt; Bool
+forall a. Ord a =&gt; a -&gt; Set a -&gt; Bool
+</span><span class="hs-identifier hs-var">Set.notMember</span></span><span> </span><span class="annot"><span class="annottext">Integer
+</span><a href="#local-6989586621679115029"><span class="hs-identifier hs-var">num</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-79"></span><span>    </span><span class="annot"><span class="annottext">Bool
+-&gt; StateT DeBruijnState Identity ()
+-&gt; StateT DeBruijnState Identity ()
+forall (f :: * -&gt; *). Applicative f =&gt; Bool -&gt; f () -&gt; f ()
+</span><span class="hs-identifier hs-var">when</span></span><span> </span><span class="annot"><span class="annottext">Bool
+</span><a href="#local-6989586621679115030"><span class="hs-identifier hs-var">isNew</span></a></span><span> </span><span class="annot"><span class="annottext">(StateT DeBruijnState Identity ()
+ -&gt; StateT DeBruijnState Identity ())
+-&gt; StateT DeBruijnState Identity ()
+-&gt; StateT DeBruijnState Identity ()
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span>
+</span><span id="line-80"></span><span>      </span><span class="annot"><span class="annottext">(Set Integer -&gt; Identity (Set Integer))
+-&gt; DeBruijnState -&gt; Identity DeBruijnState
+Lens' DeBruijnState (Set Integer)
+</span><a href="Data.Rhythm.Binary.html#seen"><span class="hs-identifier hs-var">seen</span></a></span><span> </span><span class="annot"><span class="annottext">((Set Integer -&gt; Identity (Set Integer))
+ -&gt; DeBruijnState -&gt; Identity DeBruijnState)
+-&gt; (Set Integer -&gt; Set Integer) -&gt; StateT DeBruijnState Identity ()
+forall s (m :: * -&gt; *) a b.
+MonadState s m =&gt;
+ASetter s s a b -&gt; (a -&gt; b) -&gt; m ()
+</span><a href="file:///home/yurrriq/.cabal/store/ghc-9.6.6/lens-5.3.3-d6153c0f37f97a6d1062d0cb15d1fbfa8e82ea08fcf9c8a77481c31f0573f21b/share/doc/html/src/Control.Lens.Setter.html#%25%3D"><span class="hs-operator hs-var">%=</span></a></span><span> </span><span class="annot"><span class="annottext">Integer -&gt; Set Integer -&gt; Set Integer
+forall a. Ord a =&gt; a -&gt; Set a -&gt; Set a
+</span><span class="hs-identifier hs-var">Set.insert</span></span><span> </span><span class="annot"><span class="annottext">Integer
+</span><a href="#local-6989586621679115029"><span class="hs-identifier hs-var">num</span></a></span><span>
+</span><span id="line-81"></span><span>    </span><span class="annot"><span class="annottext">Bool -&gt; State DeBruijnState Bool
+forall a. a -&gt; StateT DeBruijnState Identity a
+forall (f :: * -&gt; *) a. Applicative f =&gt; a -&gt; f a
+</span><span class="hs-identifier hs-var">pure</span></span><span> </span><span class="annot"><span class="annottext">Bool
+</span><a href="#local-6989586621679115030"><span class="hs-identifier hs-var">isNew</span></a></span><span>
+</span><span id="line-82"></span><span>
+</span><span id="line-83"></span><span class="hs-comment">-- | Convert a list of intervals to a binary string.</span><span>
+</span><span id="line-84"></span><span class="hs-comment">--</span><span>
+</span><span id="line-85"></span><span class="hs-comment">-- &gt;&gt;&gt; intervalsToBinary [2,3,4,3,4]</span><span>
+</span><span id="line-86"></span><span class="hs-comment">-- &quot;1010010001001000&quot;</span><span>
+</span><span id="line-87"></span><span class="annot"><a href="Data.Rhythm.Binary.html#intervalsToBinary"><span class="hs-identifier hs-type">intervalsToBinary</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">[</span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span class="hs-special">]</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span>
+</span><span id="line-88"></span><span id="intervalsToBinary"><span class="annot"><span class="annottext">intervalsToBinary :: [Int] -&gt; [Char]
+</span><a href="Data.Rhythm.Binary.html#intervalsToBinary"><span class="hs-identifier hs-var hs-var">intervalsToBinary</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-89"></span><span>  </span><span class="annot"><span class="annottext">(Int -&gt; [Char]) -&gt; [Int] -&gt; [Char]
+forall (t :: * -&gt; *) a b. Foldable t =&gt; (a -&gt; [b]) -&gt; t a -&gt; [b]
+</span><span class="hs-identifier hs-var">concatMap</span></span><span> </span><span class="hs-special">(</span><span class="hs-special">(</span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'1'</span></span><span> </span><span class="hs-glyph">:</span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">([Char] -&gt; [Char]) -&gt; (Int -&gt; [Char]) -&gt; Int -&gt; [Char]
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int -&gt; Char -&gt; [Char]
+forall a. Int -&gt; a -&gt; [a]
+</span><span class="hs-operator hs-var">`replicate`</span></span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'0'</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">(Int -&gt; [Char]) -&gt; (Int -&gt; Int) -&gt; Int -&gt; [Char]
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-identifier hs-var">subtract</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">1</span></span><span class="hs-special">)</span><span>
+</span><span id="line-90"></span><span>
+</span><span id="line-91"></span><span class="hs-comment">-- | All binary necklaces with a given number of ones of a given length.</span><span>
+</span><span id="line-92"></span><span class="hs-comment">--</span><span>
+</span><span id="line-93"></span><span class="hs-comment">-- &gt;&gt;&gt; necklacesPopCount 3 6</span><span>
+</span><span id="line-94"></span><span class="hs-comment">-- [[1,1,1,0,0,0],[1,1,0,1,0,0],[1,0,1,1,0,0],[1,0,1,0,1,0]]</span><span>
+</span><span id="line-95"></span><span class="annot"><a href="Data.Rhythm.Binary.html#necklacesPopCount"><span class="hs-identifier hs-type">necklacesPopCount</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">[</span><span class="hs-special">[</span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span class="hs-special">]</span><span class="hs-special">]</span><span>
+</span><span id="line-96"></span><span id="necklacesPopCount"><span class="annot"><span class="annottext">necklacesPopCount :: Int -&gt; Int -&gt; [[Int]]
+</span><a href="Data.Rhythm.Binary.html#necklacesPopCount"><span class="hs-identifier hs-var hs-var">necklacesPopCount</span></a></span></span><span> </span><span class="hs-glyph">!</span><span id="local-6989586621679115035"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679115035"><span class="hs-identifier hs-var">m</span></a></span></span><span> </span><span class="hs-glyph">!</span><span id="local-6989586621679115036"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679115036"><span class="hs-identifier hs-var">n</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-97"></span><span>  </span><span class="annot"><span class="annottext">Int -&gt; [Integer] -&gt; [[Int]]
+</span><a href="Data.Rhythm.Binary.RuskeySavageWang.html#nodesToNecklaces"><span class="hs-identifier hs-var">RSW.nodesToNecklaces</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679115036"><span class="hs-identifier hs-var">n</span></a></span><span> </span><span class="annot"><span class="annottext">([Integer] -&gt; [[Int]]) -&gt; [Integer] -&gt; [[Int]]
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span>
+</span><span id="line-98"></span><span>    </span><span class="annot"><span class="annottext">(Integer -&gt; Bool) -&gt; [Integer] -&gt; [Integer]
+forall a. (a -&gt; Bool) -&gt; [a] -&gt; [a]
+</span><span class="hs-identifier hs-var">filter</span></span><span> </span><span class="hs-special">(</span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Bool
+forall a. Eq a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">==</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679115035"><span class="hs-identifier hs-var">m</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">(Int -&gt; Bool) -&gt; (Integer -&gt; Int) -&gt; Integer -&gt; Bool
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Integer -&gt; Int
+forall a. Bits a =&gt; a -&gt; Int
+</span><span class="hs-identifier hs-var">popCount</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">([Integer] -&gt; [Integer]) -&gt; [Integer] -&gt; [Integer]
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span>
+</span><span id="line-99"></span><span>      </span><span class="annot"><span class="annottext">Tree Integer -&gt; [Integer]
+forall a. Tree a -&gt; [a]
+</span><span class="hs-identifier hs-var">flatten</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int -&gt; Tree Integer
+forall a. (Integral a, Bits a) =&gt; Int -&gt; Tree a
+</span><a href="Data.Rhythm.Binary.RuskeySavageWang.html#necklaces%27"><span class="hs-identifier hs-var">RSW.necklaces'</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679115036"><span class="hs-identifier hs-var">n</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-100"></span></pre></body></html>
