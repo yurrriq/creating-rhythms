@@ -67,6 +67,9 @@ executables:
   cfsqrt:
     <<: *executable
     main: cfsqrt/Main.hs
+  chsequl:
+    <<: *executable
+    main: chsequl/Main.hs
   comp:
     <<: *executable
     main: comp/Main.hs
