@@ -55,7 +55,7 @@
         "x86_64-linux"
       ];
 
-      perSystem = { config, pkgs, system, self', ... }: {
+      perSystem = { config, lib, pkgs, system, self', ... }: {
         _module.args.pkgs = import nixpkgs {
           overlays = [
             inputs.emacs-overlay.overlay
@@ -95,10 +95,21 @@
         };
 
         packages = {
-          creating-rhythms = pkgs.haskellPackages.callCabal2nix
-            "creating-rhythms"
-            (pkgs.nix-gitignore.gitignoreSource [ ] ./.)
-            { };
+          creating-rhythms =
+            let
+              src = lib.fileset.toSource {
+                root = ./.;
+                fileset = lib.fileset.unions [
+                  ./VERSION
+                  ./app
+                  ./examples
+                  ./package.yaml
+                  ./src
+                  ./test
+                ];
+              };
+            in
+            pkgs.haskellPackages.callCabal2nix "creating-rhythms" src.outPath { };
 
           default = self'.packages.creating-rhythms;
         };

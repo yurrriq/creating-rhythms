@@ -17,8 +17,6 @@ dependencies:
 ghc-options:
   - -Wall
   - -Werror
-default-extensions:
-  - OverloadedStrings
 library:
   ghc-options:
     - -fwarn-incomplete-patterns
@@ -34,6 +32,7 @@ library:
     - random
     - recursion-schemes
     - trifecta
+    - vector
 benchmarks:
   bench:
     ghc-options: -threaded -with-rtsopts=-N -O2
@@ -94,6 +93,14 @@ executables:
   int2b:
     <<: *executable
     main: int2b/Main.hs
+  markovgen:
+    <<: *executable
+    main: markovgen/Main.hs
+    dependencies:
+      - CreatingRhythms
+      - optparse-applicative
+      - trifecta
+      - vector
   neck:
     <<: *executable
     main: neck/Main.hs

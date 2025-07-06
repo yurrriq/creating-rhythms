@@ -1,0 +1,184 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-comment">-- |</span><span>
+</span><span id="line-2"></span><span class="hs-comment">-- Module      : Data.Rhythm.Markov</span><span>
+</span><span id="line-3"></span><span class="hs-comment">-- Copyright   : (c) Eric Bailey, 2025</span><span>
+</span><span id="line-4"></span><span class="hs-comment">--</span><span>
+</span><span id="line-5"></span><span class="hs-comment">-- License     : MIT</span><span>
+</span><span id="line-6"></span><span class="hs-comment">-- Maintainer  : eric@ericb.me</span><span>
+</span><span id="line-7"></span><span class="hs-comment">-- Stability   : experimental</span><span>
+</span><span id="line-8"></span><span class="hs-comment">-- Portability : POSIX</span><span>
+</span><span id="line-9"></span><span class="hs-comment">--</span><span>
+</span><span id="line-10"></span><span class="hs-comment">-- Generating random numbers using a Markov chain.</span><span>
+</span><span id="line-11"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Data.Rhythm.Markov</span><span>
+</span><span id="line-12"></span><span>  </span><span class="hs-special">(</span><span> </span><span class="annot"><a href="Data.Rhythm.Markov.html#TransitionMatrix"><span class="hs-identifier">TransitionMatrix</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">,</span><span>
+</span><span id="line-13"></span><span>    </span><span class="annot"><a href="Data.Rhythm.Markov.html#transitionMatrix"><span class="hs-identifier">transitionMatrix</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-14"></span><span>    </span><span class="annot"><a href="Data.Rhythm.Markov.html#markovGen"><span class="hs-identifier">markovGen</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-15"></span><span>  </span><span class="hs-special">)</span><span>
+</span><span id="line-16"></span><span class="hs-keyword">where</span><span>
+</span><span id="line-17"></span><span>
+</span><span id="line-18"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Control.Monad.IO.Class</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">MonadIO</span></span><span class="hs-special">)</span><span>
+</span><span id="line-19"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Functor</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-operator">(&lt;&amp;&gt;)</span></span><span class="hs-special">)</span><span>
+</span><span id="line-20"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="file:///nix/store/p4l7p3ss4w677iwnvn3wwjxmwdrdc845-vector-0.13.1.0-doc/share/doc/vector-0.13.1.0/html/src/Data.Vector.html"><span class="hs-identifier">Data.Vector</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="file:///nix/store/p4l7p3ss4w677iwnvn3wwjxmwdrdc845-vector-0.13.1.0-doc/share/doc/vector-0.13.1.0/html/src/Data.Vector.html#Vector"><span class="hs-identifier">Vector</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-21"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="file:///nix/store/p4l7p3ss4w677iwnvn3wwjxmwdrdc845-vector-0.13.1.0-doc/share/doc/vector-0.13.1.0/html/src/Data.Vector.html"><span class="hs-identifier">Data.Vector</span></a></span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">V</span></span><span>
+</span><span id="line-22"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="file:///nix/store/nw5w9j4r5vvcc1s96zslh297n71vw4dh-random-1.2.1.2-doc/share/doc/random-1.2.1.2/html/src/System.Random.html"><span class="hs-identifier">System.Random</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="file:///nix/store/nw5w9j4r5vvcc1s96zslh297n71vw4dh-random-1.2.1.2-doc/share/doc/random-1.2.1.2/html/src/System.Random.html#randomIO"><span class="hs-identifier">randomIO</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-23"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="file:///nix/store/xiqvscjfvln1yy5h9vcvjaw4z741b75w-trifecta-2.1.4-doc/share/doc/trifecta-2.1.4/html/src/Text.Trifecta.html"><span class="hs-identifier">Text.Trifecta</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="file:///nix/store/xiqvscjfvln1yy5h9vcvjaw4z741b75w-trifecta-2.1.4-doc/share/doc/trifecta-2.1.4/html/src/Text.Trifecta.Parser.html#Parser"><span class="hs-identifier">Parser</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="file:///nix/store/zkrzlmd2akja92i7wiyyb64ki3qv4096-parsers-0.12.12-doc/share/doc/parsers-0.12.12/html/src/Text.Parser.Combinators.html#count"><span class="hs-identifier">count</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="file:///nix/store/zkrzlmd2akja92i7wiyyb64ki3qv4096-parsers-0.12.12-doc/share/doc/parsers-0.12.12/html/src/Text.Parser.Token.html#decimal"><span class="hs-identifier">decimal</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="file:///nix/store/zkrzlmd2akja92i7wiyyb64ki3qv4096-parsers-0.12.12-doc/share/doc/parsers-0.12.12/html/src/Text.Parser.Token.html#double"><span class="hs-identifier">double</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="file:///nix/store/zkrzlmd2akja92i7wiyyb64ki3qv4096-parsers-0.12.12-doc/share/doc/parsers-0.12.12/html/src/Text.Parser.Char.html#newline"><span class="hs-identifier">newline</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-24"></span><span>
+</span><span id="line-25"></span><span class="hs-keyword">data</span><span> </span><span id="TransitionMatrix"><span class="annot"><a href="Data.Rhythm.Markov.html#TransitionMatrix"><span class="hs-identifier hs-var">TransitionMatrix</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="TransitionMatrix"><span class="annot"><a href="Data.Rhythm.Markov.html#TransitionMatrix"><span class="hs-identifier hs-var">TransitionMatrix</span></a></span></span><span>
+</span><span id="line-26"></span><span>  </span><span class="hs-special">{</span><span> </span><span id="size"><span class="annot"><span class="annottext">TransitionMatrix -&gt; Int
+</span><a href="Data.Rhythm.Markov.html#size"><span class="hs-identifier hs-var hs-var">size</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span class="hs-special">,</span><span>
+</span><span id="line-27"></span><span>    </span><span id="unTransitionMatrix"><span class="annot"><span class="annottext">TransitionMatrix -&gt; Vector (Vector Double)
+</span><a href="Data.Rhythm.Markov.html#unTransitionMatrix"><span class="hs-identifier hs-var hs-var">unTransitionMatrix</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="file:///nix/store/p4l7p3ss4w677iwnvn3wwjxmwdrdc845-vector-0.13.1.0-doc/share/doc/vector-0.13.1.0/html/src/Data.Vector.html#Vector"><span class="hs-identifier hs-type">Vector</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="file:///nix/store/p4l7p3ss4w677iwnvn3wwjxmwdrdc845-vector-0.13.1.0-doc/share/doc/vector-0.13.1.0/html/src/Data.Vector.html#Vector"><span class="hs-identifier hs-type">Vector</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Double</span></span><span class="hs-special">)</span><span>
+</span><span id="line-28"></span><span>  </span><span class="hs-special">}</span><span>
+</span><span id="line-29"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679114154"><span id="local-6989586621679114161"><span class="annot"><span class="annottext">TransitionMatrix -&gt; TransitionMatrix -&gt; Bool
+(TransitionMatrix -&gt; TransitionMatrix -&gt; Bool)
+-&gt; (TransitionMatrix -&gt; TransitionMatrix -&gt; Bool)
+-&gt; Eq TransitionMatrix
+forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
+$c== :: TransitionMatrix -&gt; TransitionMatrix -&gt; Bool
+== :: TransitionMatrix -&gt; TransitionMatrix -&gt; Bool
+$c/= :: TransitionMatrix -&gt; TransitionMatrix -&gt; Bool
+/= :: TransitionMatrix -&gt; TransitionMatrix -&gt; Bool
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679114168"><span id="local-6989586621679114177"><span id="local-6989586621679114181"><span class="annot"><span class="annottext">Int -&gt; TransitionMatrix -&gt; ShowS
+[TransitionMatrix] -&gt; ShowS
+TransitionMatrix -&gt; String
+(Int -&gt; TransitionMatrix -&gt; ShowS)
+-&gt; (TransitionMatrix -&gt; String)
+-&gt; ([TransitionMatrix] -&gt; ShowS)
+-&gt; Show TransitionMatrix
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+$cshowsPrec :: Int -&gt; TransitionMatrix -&gt; ShowS
+showsPrec :: Int -&gt; TransitionMatrix -&gt; ShowS
+$cshow :: TransitionMatrix -&gt; String
+show :: TransitionMatrix -&gt; String
+$cshowList :: [TransitionMatrix] -&gt; ShowS
+showList :: [TransitionMatrix] -&gt; ShowS
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-30"></span><span>
+</span><span id="line-31"></span><span class="annot"><a href="Data.Rhythm.Markov.html#transitionMatrix"><span class="hs-identifier hs-type">transitionMatrix</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="file:///nix/store/xiqvscjfvln1yy5h9vcvjaw4z741b75w-trifecta-2.1.4-doc/share/doc/trifecta-2.1.4/html/src/Text.Trifecta.Parser.html#Parser"><span class="hs-identifier hs-type">Parser</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="file:///nix/store/p4l7p3ss4w677iwnvn3wwjxmwdrdc845-vector-0.13.1.0-doc/share/doc/vector-0.13.1.0/html/src/Data.Vector.html#Vector"><span class="hs-identifier hs-type">Vector</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="file:///nix/store/p4l7p3ss4w677iwnvn3wwjxmwdrdc845-vector-0.13.1.0-doc/share/doc/vector-0.13.1.0/html/src/Data.Vector.html#Vector"><span class="hs-identifier hs-type">Vector</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Double</span></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-32"></span><span id="transitionMatrix"><span class="annot"><span class="annottext">transitionMatrix :: Parser (Vector (Vector Double))
+</span><a href="Data.Rhythm.Markov.html#transitionMatrix"><span class="hs-identifier hs-var hs-var">transitionMatrix</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-33"></span><span>  </span><span class="hs-keyword">do</span><span>
+</span><span id="line-34"></span><span>    </span><span id="local-6989586621679114186"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679114186"><span class="hs-identifier hs-var">n</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Integer -&gt; Int
+forall a. Num a =&gt; Integer -&gt; a
+</span><span class="hs-identifier hs-var">fromInteger</span></span><span> </span><span class="annot"><span class="annottext">(Integer -&gt; Int) -&gt; Parser Integer -&gt; Parser Int
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-operator hs-var">&lt;$&gt;</span></span><span> </span><span class="annot"><span class="annottext">Parser Integer
+forall (m :: * -&gt; *). TokenParsing m =&gt; m Integer
+</span><a href="file:///nix/store/zkrzlmd2akja92i7wiyyb64ki3qv4096-parsers-0.12.12-doc/share/doc/parsers-0.12.12/html/src/Text.Parser.Token.html#decimal"><span class="hs-identifier hs-var">decimal</span></a></span><span> </span><span class="annot"><span class="annottext">Parser Int -&gt; Parser Char -&gt; Parser Int
+forall a b. Parser a -&gt; Parser b -&gt; Parser a
+forall (f :: * -&gt; *) a b. Applicative f =&gt; f a -&gt; f b -&gt; f a
+</span><span class="hs-operator hs-var">&lt;*</span></span><span> </span><span class="annot"><span class="annottext">Parser Char
+forall (m :: * -&gt; *). CharParsing m =&gt; m Char
+</span><a href="file:///nix/store/zkrzlmd2akja92i7wiyyb64ki3qv4096-parsers-0.12.12-doc/share/doc/parsers-0.12.12/html/src/Text.Parser.Char.html#newline"><span class="hs-identifier hs-var">newline</span></a></span><span>
+</span><span id="line-35"></span><span>    </span><span class="annot"><span class="annottext">[Vector Double] -&gt; Vector (Vector Double)
+forall a. [a] -&gt; Vector a
+</span><a href="file:///nix/store/p4l7p3ss4w677iwnvn3wwjxmwdrdc845-vector-0.13.1.0-doc/share/doc/vector-0.13.1.0/html/src/Data.Vector.html#fromList"><span class="hs-identifier hs-var">V.fromList</span></a></span><span> </span><span class="annot"><span class="annottext">([Vector Double] -&gt; Vector (Vector Double))
+-&gt; Parser [Vector Double] -&gt; Parser (Vector (Vector Double))
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-operator hs-var">&lt;$&gt;</span></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Parser (Vector Double) -&gt; Parser [Vector Double]
+forall (m :: * -&gt; *) a. Applicative m =&gt; Int -&gt; m a -&gt; m [a]
+</span><a href="file:///nix/store/zkrzlmd2akja92i7wiyyb64ki3qv4096-parsers-0.12.12-doc/share/doc/parsers-0.12.12/html/src/Text.Parser.Combinators.html#count"><span class="hs-identifier hs-var">count</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679114186"><span class="hs-identifier hs-var">n</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">[Double] -&gt; Vector Double
+forall a. [a] -&gt; Vector a
+</span><a href="file:///nix/store/p4l7p3ss4w677iwnvn3wwjxmwdrdc845-vector-0.13.1.0-doc/share/doc/vector-0.13.1.0/html/src/Data.Vector.html#fromList"><span class="hs-identifier hs-var">V.fromList</span></a></span><span> </span><span class="annot"><span class="annottext">([Double] -&gt; Vector Double)
+-&gt; Parser [Double] -&gt; Parser (Vector Double)
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-operator hs-var">&lt;$&gt;</span></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Parser Double -&gt; Parser [Double]
+forall (m :: * -&gt; *) a. Applicative m =&gt; Int -&gt; m a -&gt; m [a]
+</span><a href="file:///nix/store/zkrzlmd2akja92i7wiyyb64ki3qv4096-parsers-0.12.12-doc/share/doc/parsers-0.12.12/html/src/Text.Parser.Combinators.html#count"><span class="hs-identifier hs-var">count</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679114186"><span class="hs-identifier hs-var">n</span></a></span><span> </span><span class="annot"><span class="annottext">Parser Double
+forall (m :: * -&gt; *). TokenParsing m =&gt; m Double
+</span><a href="file:///nix/store/zkrzlmd2akja92i7wiyyb64ki3qv4096-parsers-0.12.12-doc/share/doc/parsers-0.12.12/html/src/Text.Parser.Token.html#double"><span class="hs-identifier hs-var">double</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-36"></span><span>
+</span><span id="line-37"></span><span class="hs-comment">-- | Given how many numbers to create, the initial state, and a transition</span><span>
+</span><span id="line-38"></span><span class="hs-comment">-- matrix, generate random numbers using a Markov chain.</span><span>
+</span><span id="line-39"></span><span id="local-6989586621679114101"><span class="annot"><a href="Data.Rhythm.Markov.html#markovGen"><span class="hs-identifier hs-type">markovGen</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">MonadIO</span></span><span> </span><span class="annot"><a href="#local-6989586621679114101"><span class="hs-identifier hs-type">m</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="file:///nix/store/p4l7p3ss4w677iwnvn3wwjxmwdrdc845-vector-0.13.1.0-doc/share/doc/vector-0.13.1.0/html/src/Data.Vector.html#Vector"><span class="hs-identifier hs-type">Vector</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="file:///nix/store/p4l7p3ss4w677iwnvn3wwjxmwdrdc845-vector-0.13.1.0-doc/share/doc/vector-0.13.1.0/html/src/Data.Vector.html#Vector"><span class="hs-identifier hs-type">Vector</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Double</span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679114101"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="file:///nix/store/p4l7p3ss4w677iwnvn3wwjxmwdrdc845-vector-0.13.1.0-doc/share/doc/vector-0.13.1.0/html/src/Data.Vector.html#Vector"><span class="hs-identifier hs-type">Vector</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span class="hs-special">)</span></span><span>
+</span><span id="line-40"></span><span id="markovGen"><span class="annot"><span class="annottext">markovGen :: forall (m :: * -&gt; *).
+MonadIO m =&gt;
+Int -&gt; Int -&gt; Vector (Vector Double) -&gt; m (Vector Int)
+</span><a href="Data.Rhythm.Markov.html#markovGen"><span class="hs-identifier hs-var hs-var">markovGen</span></a></span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-identifier">_</span></span><span> </span><span class="annot"><span class="annottext">Vector (Vector Double)
+</span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Vector Int -&gt; m (Vector Int)
+forall a. a -&gt; m a
+forall (f :: * -&gt; *) a. Applicative f =&gt; a -&gt; f a
+</span><span class="hs-identifier hs-var">pure</span></span><span> </span><span class="annot"><span class="annottext">Vector Int
+forall a. Vector a
+</span><a href="file:///nix/store/p4l7p3ss4w677iwnvn3wwjxmwdrdc845-vector-0.13.1.0-doc/share/doc/vector-0.13.1.0/html/src/Data.Vector.html#empty"><span class="hs-identifier hs-var">V.empty</span></a></span><span>
+</span><span id="line-41"></span><span class="annot"><a href="Data.Rhythm.Markov.html#markovGen"><span class="hs-identifier hs-var">markovGen</span></a></span><span> </span><span id="local-6989586621679114210"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679114210"><span class="hs-identifier hs-var">n</span></a></span></span><span> </span><span id="local-6989586621679114211"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679114211"><span class="hs-identifier hs-var">s</span></a></span></span><span> </span><span id="local-6989586621679114212"><span class="annot"><span class="annottext">Vector (Vector Double)
+</span><a href="#local-6989586621679114212"><span class="hs-identifier hs-var">m</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Vector Int -&gt; Vector Int
+forall a. a -&gt; Vector a -&gt; Vector a
+</span><a href="file:///nix/store/p4l7p3ss4w677iwnvn3wwjxmwdrdc845-vector-0.13.1.0-doc/share/doc/vector-0.13.1.0/html/src/Data.Vector.html#cons"><span class="hs-identifier hs-var">V.cons</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679114211"><span class="hs-identifier hs-var">s</span></a></span><span> </span><span class="annot"><span class="annottext">(Vector Int -&gt; Vector Int) -&gt; m (Vector Int) -&gt; m (Vector Int)
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-operator hs-var">&lt;$&gt;</span></span><span> </span><span class="annot"><span class="annottext">((Int, Vector Double) -&gt; m (Maybe (Int, (Int, Vector Double))))
+-&gt; (Int, Vector Double) -&gt; m (Vector Int)
+forall (m :: * -&gt; *) b a.
+Monad m =&gt;
+(b -&gt; m (Maybe (a, b))) -&gt; b -&gt; m (Vector a)
+</span><a href="file:///nix/store/p4l7p3ss4w677iwnvn3wwjxmwdrdc845-vector-0.13.1.0-doc/share/doc/vector-0.13.1.0/html/src/Data.Vector.html#unfoldrM"><span class="hs-identifier hs-var">V.unfoldrM</span></a></span><span> </span><span class="annot"><span class="annottext">(Int, Vector Double) -&gt; m (Maybe (Int, (Int, Vector Double)))
+forall {f :: * -&gt; *} {a}.
+(Random a, MonadIO f, Ord a, Num a) =&gt;
+(Int, Vector a) -&gt; f (Maybe (Int, (Int, Vector Double)))
+</span><a href="#local-6989586621679114215"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">1</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Vector (Vector Double)
+</span><a href="#local-6989586621679114212"><span class="hs-identifier hs-var">m</span></a></span><span> </span><span class="annot"><span class="annottext">Vector (Vector Double) -&gt; Int -&gt; Vector Double
+forall a. Vector a -&gt; Int -&gt; a
+</span><a href="file:///nix/store/p4l7p3ss4w677iwnvn3wwjxmwdrdc845-vector-0.13.1.0-doc/share/doc/vector-0.13.1.0/html/src/Data.Vector.html#%21"><span class="hs-operator hs-var">V.!</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679114211"><span class="hs-identifier hs-var">s</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-42"></span><span>  </span><span class="hs-keyword">where</span><span>
+</span><span id="line-43"></span><span>    </span><span id="local-6989586621679114215"><span class="annot"><span class="annottext">go :: (Int, Vector a) -&gt; f (Maybe (Int, (Int, Vector Double)))
+</span><a href="#local-6989586621679114215"><span class="hs-identifier hs-var hs-var">go</span></a></span></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679114242"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679114242"><span class="hs-identifier hs-var">k</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679114243"><span class="annot"><span class="annottext">Vector a
+</span><a href="#local-6989586621679114243"><span class="hs-identifier hs-var">row</span></a></span></span><span class="hs-special">)</span><span>
+</span><span id="line-44"></span><span>      </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679114242"><span class="hs-identifier hs-var">k</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Bool
+forall a. Ord a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">&lt;</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679114210"><span class="hs-identifier hs-var">n</span></a></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-45"></span><span>          </span><span class="annot"><span class="annottext">f a
+forall a (m :: * -&gt; *). (Random a, MonadIO m) =&gt; m a
+</span><a href="file:///nix/store/nw5w9j4r5vvcc1s96zslh297n71vw4dh-random-1.2.1.2-doc/share/doc/random-1.2.1.2/html/src/System.Random.html#randomIO"><span class="hs-identifier hs-var">randomIO</span></a></span><span> </span><span class="annot"><span class="annottext">f a
+-&gt; (a -&gt; Maybe (Int, (Int, Vector Double)))
+-&gt; f (Maybe (Int, (Int, Vector Double)))
+forall (f :: * -&gt; *) a b. Functor f =&gt; f a -&gt; (a -&gt; b) -&gt; f b
+</span><span class="hs-operator hs-var">&lt;&amp;&gt;</span></span><span> </span><span class="hs-glyph">\</span><span id="local-6989586621679114245"><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679114245"><span class="hs-identifier hs-var">p</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-46"></span><span>            </span><span class="annot"><span class="annottext">(a -&gt; Bool) -&gt; Vector a -&gt; Maybe Int
+forall a. (a -&gt; Bool) -&gt; Vector a -&gt; Maybe Int
+</span><a href="file:///nix/store/p4l7p3ss4w677iwnvn3wwjxmwdrdc845-vector-0.13.1.0-doc/share/doc/vector-0.13.1.0/html/src/Data.Vector.html#findIndex"><span class="hs-identifier hs-var">V.findIndex</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">a -&gt; a -&gt; Bool
+forall a. Ord a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">&gt;</span></span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679114245"><span class="hs-identifier hs-var">p</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(a -&gt; a -&gt; a) -&gt; Vector a -&gt; Vector a
+forall a. (a -&gt; a -&gt; a) -&gt; Vector a -&gt; Vector a
+</span><a href="file:///nix/store/p4l7p3ss4w677iwnvn3wwjxmwdrdc845-vector-0.13.1.0-doc/share/doc/vector-0.13.1.0/html/src/Data.Vector.html#scanl1"><span class="hs-identifier hs-var">V.scanl1</span></a></span><span> </span><span class="annot"><span class="annottext">a -&gt; a -&gt; a
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">(+)</span></span><span> </span><span class="annot"><span class="annottext">Vector a
+</span><a href="#local-6989586621679114243"><span class="hs-identifier hs-var">row</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Maybe Int
+-&gt; (Int -&gt; (Int, (Int, Vector Double)))
+-&gt; Maybe (Int, (Int, Vector Double))
+forall (f :: * -&gt; *) a b. Functor f =&gt; f a -&gt; (a -&gt; b) -&gt; f b
+</span><span class="hs-operator hs-var">&lt;&amp;&gt;</span></span><span> </span><span class="hs-glyph">\</span><span id="local-6989586621679114250"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679114250"><span class="hs-identifier hs-var">i</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-47"></span><span>              </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679114250"><span class="hs-identifier hs-var">i</span></a></span><span class="hs-special">,</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679114242"><span class="hs-identifier hs-var">k</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">+</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">1</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Vector (Vector Double)
+</span><a href="#local-6989586621679114212"><span class="hs-identifier hs-var">m</span></a></span><span> </span><span class="annot"><span class="annottext">Vector (Vector Double) -&gt; Int -&gt; Vector Double
+forall a. Vector a -&gt; Int -&gt; a
+</span><a href="file:///nix/store/p4l7p3ss4w677iwnvn3wwjxmwdrdc845-vector-0.13.1.0-doc/share/doc/vector-0.13.1.0/html/src/Data.Vector.html#%21"><span class="hs-operator hs-var">V.!</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679114250"><span class="hs-identifier hs-var">i</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-48"></span><span>      </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">otherwise</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Maybe (Int, (Int, Vector Double))
+-&gt; f (Maybe (Int, (Int, Vector Double)))
+forall a. a -&gt; f a
+forall (f :: * -&gt; *) a. Applicative f =&gt; a -&gt; f a
+</span><span class="hs-identifier hs-var">pure</span></span><span> </span><span class="annot"><span class="annottext">Maybe (Int, (Int, Vector Double))
+forall a. Maybe a
+</span><span class="hs-identifier hs-var">Nothing</span></span><span>
+</span><span id="line-49"></span></pre></body></html>
