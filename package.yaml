@@ -31,8 +31,10 @@ library:
     - mtl
     - random
     - recursion-schemes
+    - transformers
     - trifecta
     - vector
+    - vector-sized
 benchmarks:
   bench:
     ghc-options: -threaded -with-rtsopts=-N -O2
