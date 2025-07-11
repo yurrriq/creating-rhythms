@@ -5,7 +5,7 @@
 -- | A Haskell port of the code from the book <a>Creating Rhythms</a> by
 --   Stefan Hollos and J. Richard Hollos.
 @package CreatingRhythms
-@version 0.0.29.0
+@version 0.0.30.0
 
 
 -- | Binary rhythm definitions, including conversion to ABC notation.
@@ -186,6 +186,15 @@ necklacesAllowed :: [Int] -> Int -> [[Int]]
 --   [[1,1,1,0,0,0],[1,1,0,1,0,0],[1,0,1,1,0,0],[1,0,1,0,1,0]]
 --   </pre>
 necklacesPopCount :: Int -> Int -> [[Int]]
+
+-- | All binary necklaces with a given number of ones of a given length
+--   with allowed parts.
+--   
+--   <pre>
+--   &gt;&gt;&gt; necklacesPopCountAllowed 3 5 [1,2,3]
+--   [[1,1,1,0,0],[1,1,0,1,0]]
+--   </pre>
+necklacesPopCountAllowed :: Int -> [Int] -> Int -> [[Int]]
 
 
 -- | Christoffel words.

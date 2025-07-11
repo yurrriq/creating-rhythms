@@ -109,6 +109,9 @@ executables:
   necka:
     <<: *executable
     main: necka/Main.hs
+  neckam:
+    <<: *executable
+    main: neckam/Main.hs
   neckm:
     <<: *executable
     main: neckm/Main.hs

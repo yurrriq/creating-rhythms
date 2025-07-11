@@ -20,6 +20,7 @@ module Data.Rhythm.Binary
     RSW.necklaces',
     necklacesAllowed,
     necklacesPopCount,
+    necklacesPopCountAllowed,
   )
 where
 
@@ -109,6 +110,19 @@ necklacesPopCount !m !n =
   RSW.nodesToNecklaces n $
     filter ((== m) . popCount) $
       flatten (RSW.necklaces' n)
+
+-- | All binary necklaces with a given number of ones of a given length with
+-- allowed parts.
+--
+-- >>> necklacesPopCountAllowed 3 5 [1,2,3]
+-- [[1,1,1,0,0],[1,1,0,1,0]]
+necklacesPopCountAllowed :: Int -> [Int] -> Int -> [[Int]]
+necklacesPopCountAllowed m allowed n =
+  RSW.nodesToNecklaces n $
+    filter ((> 0) <&&> ((== m) . popCount) <&&> isAllowed) $
+      flatten (RSW.necklaces' n)
+  where
+    isAllowed = all (`IntSet.member` IntSet.fromList allowed) . countParts n
 
 -- | Count the parts in the n-digit little-endian binary representation of x.
 --
