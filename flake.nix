@@ -79,7 +79,6 @@
             abcmidi
             cabal-install
             ccls
-            delta
             ghc
             ghcid
             haskell-language-server
@@ -87,7 +86,6 @@
             haskellPackages.hlint
             haskellPackages.ormolu
             haskellPackages.pointfree
-            just
             myEmacs
             nixd
             timidity
