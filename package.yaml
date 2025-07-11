@@ -18,12 +18,15 @@ ghc-options:
   - -Wall
   - -Werror
 library:
+  default-extensions:
+    - StrictData
   ghc-options:
     - -fwarn-incomplete-patterns
   source-dirs: src
   dependencies:
     - combinat
     - containers
+    - control-bool
     - extra
     - fast-digits
     - finite-typelits
@@ -92,6 +95,10 @@ executables:
   debruijn:
     <<: *executable
     main: debruijn/Main.hs
+    dependencies:
+      - CreatingRhythms
+      - finite-typelits
+      - optparse-applicative
   int2b:
     <<: *executable
     main: int2b/Main.hs
@@ -100,21 +107,38 @@ executables:
     main: markovgen/Main.hs
     dependencies:
       - CreatingRhythms
+      - finite-typelits
       - optparse-applicative
       - trifecta
       - vector
   neck:
     <<: *executable
     main: neck/Main.hs
+    dependencies:
+      - CreatingRhythms
+      - finite-typelits
+      - optparse-applicative
   necka:
     <<: *executable
     main: necka/Main.hs
+    dependencies:
+      - CreatingRhythms
+      - finite-typelits
+      - optparse-applicative
   neckam:
     <<: *executable
     main: neckam/Main.hs
+    dependencies:
+      - CreatingRhythms
+      - finite-typelits
+      - optparse-applicative
   neckm:
     <<: *executable
     main: neckm/Main.hs
+    dependencies:
+      - CreatingRhythms
+      - finite-typelits
+      - optparse-applicative
   part:
     <<: *executable
     main: part/Main.hs
@@ -149,6 +173,10 @@ executables:
   pfold:
     <<: *executable
     main: pfold/Main.hs
+    dependencies:
+      - CreatingRhythms
+      - finite-typelits
+      - optparse-applicative
   rndint:
     <<: *executable
     main: rndint/Main.hs

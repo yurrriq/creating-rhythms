@@ -1,6 +1,16 @@
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE ExplicitNamespaces #-}
 
+-- |
+-- Module      : Data.Rhythm.Random
+-- Copyright   : (c) Eric Bailey, 2025
+--
+-- License     : MIT
+-- Maintainer  : eric@ericb.me
+-- Stability   : stable
+-- Portability : POSIX
+--
+-- Generate random numbers with specified correlation.
 module Data.Rhythm.Random where
 
 import Control.Monad (foldM, (>=>))

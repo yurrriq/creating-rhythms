@@ -1,10 +1,12 @@
+{-# LANGUAGE DataKinds #-}
+
 -- |
--- Module      : Data.Rhythm.Binary.BurrowsWheeler
+-- Module      : Data.Rhythm.Binary.Necklaces.BurrowsWheeler
 -- Copyright   : (c) Eric Bailey, 2025
 --
 -- License     : MIT
 -- Maintainer  : eric@ericb.me
--- Stability   : experimental
+-- Stability   : stable
 -- Portability : POSIX
 --
 -- Binary [necklaces](http://combos.org/necklace) via the set of Lyndon words
@@ -12,13 +14,14 @@
 -- transform](https://en.wikipedia.org/wiki/Burrows%E2%80%93Wheeler_transform).
 -- Modified from [Rosetta
 -- Code](https://rosettacode.org/wiki/De_Bruijn_sequences#Permutation-based).
-module Data.Rhythm.Binary.BurrowsWheeler
+module Data.Rhythm.Binary.Necklaces.BurrowsWheeler
   ( necklaces,
     lyndonWords,
     cycleForm,
   )
 where
 
+import Data.Finite (Finite)
 import Data.Functor.Base (ListF (..))
 import Data.Functor.Foldable (ana)
 import Data.IntMap.Strict ((!))
@@ -27,11 +30,14 @@ import Data.List (elemIndices, sortOn)
 import Data.List.Extra (snoc)
 import Data.Ord (Down (..))
 
+-- $setup
+-- >>> import Data.Finite (getFinite)
+
 -- | All binary necklaces of a given length.
 --
--- >>> necklaces 4
+-- >>> map getFinite <$> necklaces 4
 -- [[1,1,1,1],[1,1,1,0],[1,1,0,0],[1,0,1,0],[1,0,0,0],[0,0,0,0]]
-necklaces :: Int -> [[Int]]
+necklaces :: Int -> [[Finite 2]]
 necklaces n =
   sortOn Down $
     map (reverse . take n . cycle) $

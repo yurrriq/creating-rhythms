@@ -1,9 +1,10 @@
+import Data.Finite (getFinite)
 import Data.Rhythm.Binary (necklacesAllowed)
 import Options.Applicative
 
 main :: IO ()
 main =
-  printNecklaces
+  mapM_ (putStrLn . concatMap (show . getFinite))
     . uncurry (flip necklacesAllowed)
     =<< customExecParser p opts
   where
@@ -15,6 +16,3 @@ main =
         )
         (fullDesc <> progDesc "Binary necklaces with allowed parts.")
     p = prefs showHelpOnEmpty
-
-printNecklaces :: [[Int]] -> IO ()
-printNecklaces = mapM_ (putStrLn . concatMap show)

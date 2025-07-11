@@ -4,7 +4,7 @@
 --
 -- License     : MIT
 -- Maintainer  : eric@ericb.me
--- Stability   : experimental
+-- Stability   : stable
 -- Portability : POSIX
 --
 -- [Integer partitions](https://mathworld.wolfram.com/Partition.html), i.e.,

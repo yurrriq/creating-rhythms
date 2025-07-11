@@ -1,7 +1,7 @@
 module Test.Rhythm.Binary where
 
-import Data.Rhythm.Binary.BurrowsWheeler qualified as BW
-import Data.Rhythm.Binary.RuskeySavageWang qualified as RSW
+import Data.Rhythm.Binary.Necklaces.BurrowsWheeler qualified as BW
+import Data.Rhythm.Binary.Necklaces.RuskeySavageWang qualified as RSW
 import Test.Tasty (TestTree, testGroup)
 import Test.Tasty.HUnit (testCase, (@?=))
 import Text.Printf (printf)

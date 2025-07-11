@@ -4,7 +4,7 @@
 --
 -- License     : MIT
 -- Maintainer  : eric@ericb.me
--- Stability   : experimental
+-- Stability   : stable
 -- Portability : POSIX
 --
 -- [Simple continued fractions](https://mathworld.wolfram.com/SimpleContinuedFraction.html)
@@ -80,11 +80,7 @@ continuedFractionSqrt n
         do
           guard (c /= 2 * root)
           let a' = b * c - a
-          let b' = (n' - a' * a') `div` b
+          let b' = (n - a' * a') `div` b
           let c' = (root + a') `div` b'
           pure (a', b', c')
-    root = isqrt n
-    n' = fromIntegral n
-
-isqrt :: (Integral a) => a -> a
-isqrt = truncate . sqrt @Double . fromIntegral
+    root = truncate (sqrt @Double (fromIntegral n))

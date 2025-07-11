@@ -1,5 +1,8 @@
-import Data.Rhythm.Markov (markovGen, transitionMatrix)
-import Data.Vector qualified as V
+import Data.Finite (finite, getFinite)
+import Data.Foldable (toList)
+import Data.Proxy (Proxy)
+import Data.Rhythm.Markov (SomeTransitionMatrix (..), TransitionMatrix (..), markovGen, someTransitionMatrix)
+import GHC.TypeNats (SomeNat (..), someNatVal)
 import Options.Applicative
 import Text.Trifecta (parseFromFile)
 
@@ -7,15 +10,22 @@ main :: IO ()
 main =
   do
     (mfile, s, n) <- customExecParser (prefs showHelpOnEmpty) opts
-    maybeMatrix <- parseFromFile transitionMatrix mfile
-    numbers <- maybe (error "Oh no!") (markovGen n s) maybeMatrix
-    putStrLn (unwords (map show (V.toList numbers)))
+    case someNatVal (fromIntegral n) of
+      SomeNat (_ :: Proxy steps) ->
+        do
+          maybeMatrix <- parseFromFile someTransitionMatrix mfile
+          case maybeMatrix of
+            Just (SomeTransitionMatrix (matrix :: TransitionMatrix n)) ->
+              print matrix
+                *> markovGen @n @steps matrix (finite @n s)
+                >>= putStrLn . unwords . map (show . getFinite) . toList
+            Nothing -> fail "Invalid transition matrix"
   where
     opts =
       info args $
-        fullDesc <> progDesc "Generate random numbers using a Markov chain"
+        fullDesc <> progDesc "Generate random numbers using a Markov chain."
 
-args :: Parser (FilePath, Int, Int)
+args :: Parser (FilePath, Integer, Integer)
 args =
   (,,)
     <$> argument str (metavar "MFILE" <> help "transition matrix file name")

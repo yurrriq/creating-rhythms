@@ -1,48 +1,79 @@
+{-# LANGUAGE DataKinds #-}
+{-# LANGUAGE ExplicitNamespaces #-}
+
 -- |
 -- Module      : Data.Rhythm.Markov
 -- Copyright   : (c) Eric Bailey, 2025
 --
 -- License     : MIT
 -- Maintainer  : eric@ericb.me
--- Stability   : experimental
+-- Stability   : stable
 -- Portability : POSIX
 --
 -- Generating random numbers using a Markov chain.
 module Data.Rhythm.Markov
   ( TransitionMatrix (..),
-    transitionMatrix,
+    SomeTransitionMatrix (..),
     markovGen,
+    someTransitionMatrix,
   )
 where
 
-import Control.Monad.IO.Class (MonadIO)
-import Data.Functor ((<&>))
-import Data.Vector (Vector)
-import Data.Vector qualified as V
+import Control.Monad.State.Strict (MonadIO, evalStateT, liftIO)
+import Control.Monad.Trans.State.Strict (get, modifyM)
+import Data.Finite (Finite)
+import Data.List (intercalate)
+import Data.Proxy (Proxy)
+import Data.Vector.Sized (Vector)
+import Data.Vector.Sized qualified as VS
+import GHC.Generics (Generic)
+import GHC.TypeNats (KnownNat, Nat, SomeNat (..), someNatVal)
 import System.Random (randomIO)
+import Text.Printf (printf)
 import Text.Trifecta (Parser, count, decimal, double, newline)
 
-data TransitionMatrix = TransitionMatrix
-  { size :: Int,
-    unTransitionMatrix :: Vector (Vector Double)
+-- | An \(n \times n\) transition matrix.
+newtype TransitionMatrix (n :: Nat) = TransitionMatrix
+  { unTransitionMatrix :: Vector n (Vector n Double)
   }
-  deriving (Eq, Show)
+  deriving (Eq, Generic)
 
-transitionMatrix :: Parser (Vector (Vector Double))
-transitionMatrix =
+instance Show (TransitionMatrix n) where
+  show (TransitionMatrix matrix) =
+    intercalate "\n" $
+      map (unwords . map (printf "%.6f") . VS.toList) $
+        VS.toList matrix
+
+-- | Existential wrapper around a square 'TransitionMatrix' of unknown size.
+data SomeTransitionMatrix where
+  SomeTransitionMatrix :: (KnownNat n) => TransitionMatrix n -> SomeTransitionMatrix
+
+deriving instance Show SomeTransitionMatrix
+
+-- | Parse a square 'TransitionMatrix' of unknown size.
+someTransitionMatrix :: Parser SomeTransitionMatrix
+someTransitionMatrix =
   do
     n <- fromInteger <$> decimal <* newline
-    V.fromList <$> count n (V.fromList <$> count n double)
+    rows <- count n (count n double)
+    case someNatVal (fromIntegral n) of
+      SomeNat (_ :: Proxy n) ->
+        case traverse (VS.fromList @n) rows >>= VS.fromList of
+          Just vec -> pure (SomeTransitionMatrix (TransitionMatrix vec))
+          Nothing -> fail "Invalid transition matrix"
 
--- | Given how many numbers to create, the initial state, and a transition
--- matrix, generate random numbers using a Markov chain.
-markovGen :: (MonadIO m) => Int -> Int -> Vector (Vector Double) -> m (Vector Int)
-markovGen 0 _ _ = pure V.empty
-markovGen n s m = V.cons s <$> V.unfoldrM go (1, m V.! s)
+-- | Generate random numbers using a Markov chain.
+markovGen ::
+  forall n steps m.
+  (KnownNat n, KnownNat steps, MonadIO m, MonadFail m) =>
+  TransitionMatrix n ->
+  Finite n ->
+  m (Vector steps (Finite n))
+markovGen (TransitionMatrix matrix) = evalStateT (VS.generateM go)
   where
-    go (k, row)
-      | k < n =
-          randomIO <&> \p ->
-            V.findIndex (> p) (V.scanl1 (+) row) <&> \i ->
-              (i, (k + 1, m V.! i))
-      | otherwise = pure Nothing
+    go = const (get <* modifyM (step . VS.index matrix))
+
+    step row =
+      liftIO randomIO >>= \p ->
+        maybe (fail "Invalid transition matrix row") pure $
+          VS.findIndex (> p) (VS.tail (VS.scanl (+) 0 row))

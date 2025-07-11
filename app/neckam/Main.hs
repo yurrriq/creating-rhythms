@@ -1,3 +1,4 @@
+import Data.Finite (getFinite)
 import Data.Rhythm.Binary (necklacesPopCountAllowed)
 import Options.Applicative
 
@@ -5,7 +6,7 @@ main :: IO ()
 main =
   putStr
     . unlines
-    . map (foldMap show)
+    . map (foldMap (show . getFinite))
     . (\(n, m, ps) -> necklacesPopCountAllowed m ps n)
     =<< customExecParser p opts
   where

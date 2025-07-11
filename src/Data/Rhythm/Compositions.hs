@@ -4,12 +4,21 @@
 --
 -- License     : MIT
 -- Maintainer  : eric@ericb.me
--- Stability   : experimental
+-- Stability   : stable
 -- Portability : POSIX
 --
 -- [Combinatorial compositions](https://mathworld.wolfram.com/Composition.html),
 -- i.e., [partitions]("Data.Rhythm.Partitions") in which order is significant.
-module Data.Rhythm.Compositions where
+module Data.Rhythm.Compositions
+  ( Composition,
+    compositions,
+    compositionsAllowed,
+    compositionsLength,
+    compositionsLengthAllowed,
+    randomComposition,
+    randomCompositionLength,
+  )
+where
 
 import Data.Bool (bool)
 import Math.Combinat.Compositions (Composition, compositions1)

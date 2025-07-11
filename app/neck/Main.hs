@@ -1,3 +1,4 @@
+import Data.Finite (getFinite)
 import Data.Maybe (fromMaybe)
 import Data.Rhythm.Binary (necklaces)
 import Options.Applicative
@@ -15,4 +16,4 @@ main = printNecklaces =<< customExecParser p opts
     p = prefs showHelpOnEmpty
 
 printNecklaces :: Int -> IO ()
-printNecklaces = mapM_ (putStrLn . concatMap show) . necklaces
+printNecklaces = mapM_ (putStrLn . concatMap (show . getFinite)) . necklaces

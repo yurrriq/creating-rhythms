@@ -1,11 +1,10 @@
 {-# LANGUAGE RecordWildCards #-}
-{-# LANGUAGE StrictData #-}
 
 import Data.Finite (finite, getFinite)
 import Data.Foldable (toList)
 import Data.Proxy (Proxy)
 import Data.Rhythm.Random (randomFinites)
-import GHC.TypeNats (SomeNat (SomeNat), someNatVal)
+import GHC.TypeNats (SomeNat (..), someNatVal)
 import Options.Applicative
 
 data Args = Args

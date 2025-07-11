@@ -4,7 +4,7 @@
 --
 -- License     : MIT
 -- Maintainer  : eric@ericb.me
--- Stability   : experimental
+-- Stability   : stable
 -- Portability : POSIX
 --
 -- Strictly lexicographically larger permutations of a given list of numbers.
@@ -16,6 +16,7 @@ import Data.List qualified as List
 --
 -- >>> permutations [1,2,3]
 -- [[1,2,3],[2,1,3],[3,2,1],[2,3,1],[3,1,2],[1,3,2]]
+--
 -- >>> permutations [3,1,2]
 -- [[3,1,2],[3,2,1]]
 permutations :: (Integral a) => [a] -> [[a]]

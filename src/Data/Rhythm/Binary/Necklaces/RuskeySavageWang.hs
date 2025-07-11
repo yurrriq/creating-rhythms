@@ -1,12 +1,13 @@
+{-# LANGUAGE DataKinds #-}
 {-# LANGUAGE UnicodeSyntax #-}
 
 -- |
--- Module      : Data.Rhythm.Binary.RuskeySavageWang
+-- Module      : Data.Rhythm.Binary.Necklaces.RuskeySavageWang
 -- Copyright   : (c) Eric Bailey, 2025
 --
 -- License     : MIT
 -- Maintainer  : eric@ericb.me
--- Stability   : experimental
+-- Stability   : stable
 -- Portability : POSIX
 --
 -- Binary [necklaces](http://combos.org/necklace), internally encoded as
@@ -16,7 +17,7 @@
 --   - Frank Ruskey, Carla Savage, Terry Min Yih Wang, Generating necklaces,
 --     Journal of Algorithms, Volume 13, Issue 3, 1992, Pages 414-430, ISSN
 --     0196-6774, https://doi.org/10.1016/0196-6774(92)90047-G.
-module Data.Rhythm.Binary.RuskeySavageWang
+module Data.Rhythm.Binary.Necklaces.RuskeySavageWang
   ( necklaces,
     necklaces',
     nodesToNecklaces,
@@ -25,16 +26,20 @@ where
 
 import Data.Bits (Bits (complementBit, rotateL, shiftL))
 import Data.FastDigits (digits)
+import Data.Finite (Finite, finite)
 import Data.List (sortOn)
 import Data.List.NonEmpty qualified as NE
 import Data.Ord (Down (..))
 import Data.Tree (Tree (..), flatten, unfoldTree)
 
+-- $setup
+-- >>> import Data.Finite (getFinite)
+
 -- | All binary necklaces of a given length.
 --
--- >>> necklaces 4
+-- >>> map getFinite <$> necklaces 4
 -- [[1,1,1,1],[1,1,1,0],[1,1,0,0],[1,0,1,0],[1,0,0,0],[0,0,0,0]]
-necklaces :: Int -> [[Int]]
+necklaces :: Int -> [[Finite 2]]
 necklaces !n =
   nodesToNecklaces n $
     flatten (necklaces' n)
@@ -79,14 +84,14 @@ necklaces' !n = Node 0 [unfoldTree search 1]
 
 -- | Convert a list of nodes to binary necklaces of a given length.
 --
--- >>> nodesToNecklaces 4 [3,5]
+-- >>> map getFinite <$> nodesToNecklaces 4 [3,5]
 -- [[1,1,0,0],[1,0,1,0]]
-nodesToNecklaces :: Int -> [Integer] -> [[Int]]
+nodesToNecklaces :: Int -> [Integer] -> [[Finite 2]]
 nodesToNecklaces !n =
   sortOn Down
-    . map (padUpTo n . digits 2)
+    . map (padUpTo n . map (finite . toInteger) . digits 2)
 
 -- modified from Data.FastDigits
-padUpTo :: Int -> [Int] -> [Int]
+padUpTo :: (Num a) => Int -> [a] -> [a]
 padUpTo !n [] = replicate n 0
 padUpTo !n (x : xs) = x : padUpTo (n - 1) xs

@@ -7,7 +7,7 @@
 --
 -- License     : MIT
 -- Maintainer  : eric@ericb.me
--- Stability   : experimental
+-- Stability   : stable
 -- Portability : POSIX
 --
 -- Binary rhythm definitions, including conversion to ABC notation.
@@ -33,13 +33,13 @@ import Text.Trifecta (Parser, char, count, natural, newline, skipOptional, (<?>)
 -- notes.
 data BinaryRhythmDefinition = BinaryRhythmDefinition
   { -- | beats per minute
-    tempo :: !Int,
+    tempo :: Int,
     -- | number of notes in each rhythm
-    noteCount :: !Int,
+    noteCount :: Int,
     -- | number of rhythms
-    rhythmCount :: !Int,
+    rhythmCount :: Int,
     -- | a list of binary rhythms
-    rhythms :: ![BinaryRhythm]
+    rhythms :: [BinaryRhythm]
   }
   deriving (Eq)
 
@@ -52,9 +52,9 @@ instance Show BinaryRhythmDefinition where
 -- words where a @1@ represents an onset.
 data BinaryRhythm = BinaryRhythm
   { -- | MIDI instrument number
-    instrumentNumber :: !Int,
+    instrumentNumber :: Int,
     -- | a list of zeros and ones
-    notes :: ![Finite 2]
+    notes :: [Finite 2]
   }
   deriving (Eq)
 
