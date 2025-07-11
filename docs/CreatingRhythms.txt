@@ -5,7 +5,7 @@
 -- | A Haskell port of the code from the book <a>Creating Rhythms</a> by
 --   Stefan Hollos and J. Richard Hollos.
 @package CreatingRhythms
-@version 0.0.28.1
+@version 0.0.29.0
 
 
 -- | Binary rhythm definitions, including conversion to ABC notation.

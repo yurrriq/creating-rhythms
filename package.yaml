@@ -146,6 +146,13 @@ executables:
   pfold:
     <<: *executable
     main: pfold/Main.hs
+  rndint:
+    <<: *executable
+    main: rndint/Main.hs
+    dependencies:
+      - CreatingRhythms
+      - finite-typelits
+      - optparse-applicative
 tests:
   unit:
     build-tools:
