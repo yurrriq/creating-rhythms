@@ -78,7 +78,6 @@
           nativeBuildInputs = with pkgs; [
             abcmidi
             cabal-install
-            ccls
             ghc
             ghcid
             haskell-language-server
@@ -120,7 +119,6 @@
 
         treefmt = {
           programs = {
-            clang-format.enable = true;
             deadnix.enable = true;
             hlint.enable = true;
             nixpkgs-fmt.enable = true;
@@ -130,11 +128,6 @@
                 "GHC2021"
               ];
             };
-          };
-          settings.formatter = {
-            clang-format.options = [
-              "-style=file"
-            ];
           };
         };
       };

@@ -60,8 +60,7 @@
   :config (global-hl-todo-mode t))
 
 (use-package lsp-mode
-  :hook ((c-mode
-          haskell-mode
+  :hook ((haskell-mode
           nix-mode)
          . lsp-deferred)
   :commands (lsp lsp-deferred)
@@ -76,8 +75,7 @@
 
 (use-package lsp-ui
   :hook
-  ((c-mode
-    haskell-mode
+  ((haskell-mode
     nix-mode)
    . lsp-ui-mode)
   :custom
@@ -87,12 +85,6 @@
   :config
   ;; NOTE: https://github.com/emacs-lsp/lsp-ui/issues/285
   (set-face-attribute 'markdown-code-face nil :family "Iosevka Nerd Font Mono" :height 110))
-
-(use-package ccls
-  :custom
-  (ccls-executable "ccls")
-  (c-default-style "k&r")
-  (c-basic-offset 2))
 
 (use-package multiple-cursors
   :demand
