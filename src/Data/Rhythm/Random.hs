@@ -1,5 +1,5 @@
 {-# LANGUAGE DataKinds #-}
-{-# LANGUAGE TypeOperators #-}
+{-# LANGUAGE ExplicitNamespaces #-}
 
 module Data.Rhythm.Random where
 
@@ -15,13 +15,13 @@ import GHC.TypeLits (KnownNat, natVal, type (+))
 import System.Random (randomIO)
 
 -- | Generate a vector of random numbers with specified correlation.
-randomInt ::
-  forall m x y.
-  (MonadIO m, KnownNat (x + 1), KnownNat y) =>
-  Finite (x + 1) ->
-  Finite (x + 1) ->
-  m (Vector (1 + y) (Finite (x + 1)))
-randomInt startingNumber correlation =
+randomFinites ::
+  forall x y m.
+  (KnownNat x, KnownNat y, MonadIO m) =>
+  Finite x ->
+  Finite x ->
+  m (Vector (1 + y) (Finite x))
+randomFinites startingNumber correlation =
   VS.cons startingNumber
     <$> evalStateT (VS.replicateM generateNumbers) (getFinite startingNumber)
   where
@@ -41,4 +41,4 @@ randomInt startingNumber correlation =
         <$> liftIO randomIO
 
     c = getFinite correlation
-    m = natVal (Proxy @(x + 1)) - 1
+    m = natVal (Proxy @x) - 1

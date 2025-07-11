@@ -5,7 +5,7 @@
 -- | A Haskell port of the code from the book <a>Creating Rhythms</a> by
 --   Stefan Hollos and J. Richard Hollos.
 @package CreatingRhythms
-@version 0.0.27.0
+@version 0.0.28.1
 
 
 -- | Binary rhythm definitions, including conversion to ABC notation.
@@ -402,3 +402,8 @@ module Data.Rhythm.Permutations
 --   [[3,1,2],[3,2,1]]
 --   </pre>
 permutations :: Integral a => [a] -> [[a]]
+
+module Data.Rhythm.Random
+
+-- | Generate a vector of random numbers with specified correlation.
+randomFinites :: forall x y m. (KnownNat x, KnownNat y, MonadIO m) => Finite x -> Finite x -> m (Vector (1 + y) (Finite x))
