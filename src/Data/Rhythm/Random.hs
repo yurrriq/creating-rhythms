@@ -14,10 +14,12 @@
 module Data.Rhythm.Random where
 
 import Control.Monad (foldM, (>=>))
-import Control.Monad.State.Strict (MonadIO, evalStateT, gets, liftIO)
-import Control.Monad.Trans.State.Strict (modifyM)
+import Control.Monad.IO.Class (MonadIO, liftIO)
+import Control.Monad.Loops (unfoldrM)
 import Data.Bool (bool)
 import Data.Finite (Finite, finite, getFinite)
+import Data.Functor ((<&>))
+import Data.Maybe (fromJust)
 import Data.Proxy (Proxy (..))
 import Data.Vector.Sized (Vector)
 import Data.Vector.Sized qualified as VS
@@ -32,10 +34,13 @@ randomFinites ::
   Finite x ->
   m (Vector (1 + y) (Finite x))
 randomFinites startingNumber correlation =
-  VS.cons startingNumber
-    <$> evalStateT (VS.replicateM generateNumbers) (getFinite startingNumber)
+  VS.cons startingNumber . VS.map finite . fromJust . VS.fromListN
+    <$> unfoldrM go (natVal (Proxy @y), getFinite startingNumber)
   where
-    generateNumbers = gets finite <* modifyM applyCorrelation
+    go (0, _) = pure Nothing
+    go (n, prev) =
+      applyCorrelation prev <&> \next ->
+        Just (next, (n - 1, next))
 
     applyCorrelation =
       flip (foldM doDecrement) [m, m - 1 .. m - c + 1]
@@ -50,5 +55,5 @@ randomFinites startingNumber correlation =
       bool prev (min m (prev + 1))
         <$> liftIO randomIO
 
-    c = getFinite correlation
     m = natVal (Proxy @x) - 1
+    c = getFinite correlation

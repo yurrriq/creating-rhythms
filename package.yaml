@@ -31,11 +31,11 @@ library:
     - fast-digits
     - finite-typelits
     - lens
+    - monad-loops
     - mtl
     - random
     - recursion-schemes
     - slist
-    - transformers
     - trifecta
     - vector
     - vector-sized

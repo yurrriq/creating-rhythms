@@ -19,17 +19,19 @@ module Data.Rhythm.Markov
   )
 where
 
-import Control.Monad.State.Strict (MonadIO, evalStateT, liftIO)
-import Control.Monad.Trans.State.Strict (get, modifyM)
+import Control.Arrow (second)
+import Control.Monad.IO.Class (MonadIO, liftIO)
+import Control.Monad.Loops (unfoldrM)
 import Data.Finite (Finite)
+import Data.Functor ((<&>))
 import Data.List (intercalate)
-import Data.Maybe (fromMaybe)
-import Data.Proxy (Proxy)
+import Data.Maybe (fromJust, fromMaybe)
+import Data.Proxy (Proxy (..))
 import Data.Vector.Sized (Vector)
 import Data.Vector.Sized qualified as VS
 import GHC.Generics (Generic)
 import GHC.IsList (IsList (..))
-import GHC.TypeNats (KnownNat, Nat, SomeNat (..), someNatVal)
+import GHC.TypeNats (KnownNat, Nat, SomeNat (..), natVal, someNatVal)
 import Slist (len)
 import System.Random (randomIO)
 import Text.Printf (printf)
@@ -86,11 +88,13 @@ markovGen ::
   TransitionMatrix n ->
   Finite n ->
   m (Vector steps (Finite n))
-markovGen (TransitionMatrix matrix) = evalStateT (VS.generateM go)
+markovGen (TransitionMatrix matrix) start =
+  fromJust . (VS.fromListN @steps)
+    <$> unfoldrM (go . second (VS.index matrix)) (steps, start)
   where
-    go = const (get <* modifyM (step . VS.index matrix))
-
-    step row =
-      liftIO randomIO >>= \p ->
-        maybe (fail "Invalid transition matrix row") pure $
-          VS.findIndex (> p) (VS.tail (VS.scanl (+) 0 row))
+    go (0, _) = pure Nothing
+    go (n, prev) =
+      liftIO randomIO <&> \p ->
+        VS.findIndex (> p) (VS.tail (VS.scanl (+) 0 prev)) <&> \next ->
+          (next, (n - 1, next))
+    steps = natVal (Proxy @steps)
