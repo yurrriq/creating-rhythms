@@ -34,6 +34,7 @@ library:
     - mtl
     - random
     - recursion-schemes
+    - slist
     - transformers
     - trifecta
     - vector

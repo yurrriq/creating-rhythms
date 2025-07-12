@@ -1,5 +1,5 @@
 {-# LANGUAGE DataKinds #-}
-{-# LANGUAGE ExplicitNamespaces #-}
+{-# LANGUAGE TypeFamilies #-}
 
 -- |
 -- Module      : Data.Rhythm.Markov
@@ -23,11 +23,14 @@ import Control.Monad.State.Strict (MonadIO, evalStateT, liftIO)
 import Control.Monad.Trans.State.Strict (get, modifyM)
 import Data.Finite (Finite)
 import Data.List (intercalate)
+import Data.Maybe (fromMaybe)
 import Data.Proxy (Proxy)
 import Data.Vector.Sized (Vector)
 import Data.Vector.Sized qualified as VS
 import GHC.Generics (Generic)
+import GHC.IsList (IsList (..))
 import GHC.TypeNats (KnownNat, Nat, SomeNat (..), someNatVal)
+import Slist (len)
 import System.Random (randomIO)
 import Text.Printf (printf)
 import Text.Trifecta (Parser, count, decimal, double, newline)
@@ -48,7 +51,21 @@ instance Show (TransitionMatrix n) where
 data SomeTransitionMatrix where
   SomeTransitionMatrix :: (KnownNat n) => TransitionMatrix n -> SomeTransitionMatrix
 
-deriving instance Show SomeTransitionMatrix
+instance Show SomeTransitionMatrix where
+  show (SomeTransitionMatrix matrix) = show matrix
+
+instance IsList SomeTransitionMatrix where
+  type Item SomeTransitionMatrix = [Double]
+
+  fromList rows =
+    fromMaybe (error "Invalid transition matrix") $
+      case someNatVal (fromIntegral (len (fromList rows))) of
+        SomeNat (_ :: Proxy n) ->
+          SomeTransitionMatrix . TransitionMatrix
+            <$> (VS.fromListN @n =<< traverse VS.fromListN rows)
+
+  toList (SomeTransitionMatrix (TransitionMatrix matrix)) =
+    VS.toList <$> VS.toList matrix
 
 -- | Parse a square 'TransitionMatrix' of unknown size.
 someTransitionMatrix :: Parser SomeTransitionMatrix
