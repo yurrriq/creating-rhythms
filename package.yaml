@@ -1,9 +1,9 @@
 name: CreatingRhythms
 version: !include "./VERSION"
 description: |-
-  A Haskell port of the code from the book
-  [Creating Rhythms](https://abrazol.com/books/rhythm1/index.html) by Stefan
-  Hollos and J. Richard Hollos.
+  An implementation of the algorithms from
+  [Creating Rhythms](https://abrazol.com/books/rhythm1/) by Stefan Hollos and
+  J. Richard Hollos.
 author: Eric Bailey
 maintainer: eric@ericb.me
 github: yurrriq/creating-rhythms
