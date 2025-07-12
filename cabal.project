@@ -13,6 +13,9 @@ source-repository-package
     location: https://github.com/bkomuves/combinat.git
     tag: d5a22c2b7205455b3ddee681456d110d5cc7696e
 
+package combinat
+    documentation: True
+
 source-repository-package
     type: git
     location: https://github.com/Bodigrim/fast-digits.git
