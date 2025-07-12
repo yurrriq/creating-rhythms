@@ -11,8 +11,7 @@
 -- Stability   : stable
 -- Portability : POSIX
 --
--- De Bruijn sequences, and conversion between binary strings and lists of
--- intervals.
+-- Binary de Bruijn sequences.
 module Data.Rhythm.Binary.DeBruijn
   ( deBruijnSequence,
   )
