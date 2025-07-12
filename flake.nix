@@ -127,8 +127,14 @@
                   ./test
                 ];
               };
+
+              pkg = pkgs.haskellPackages.callCabal2nix "creating-rhythms" src.outPath { };
             in
-            pkgs.haskellPackages.callCabal2nix "creating-rhythms" src.outPath { };
+            pkgs.haskell.lib.overrideCabal pkg {
+              haddockFlags = [
+                "--html-location='https://hackage.haskell.org/package/$pkgid/docs/'"
+              ];
+            };
 
           default = self'.packages.creating-rhythms;
         };

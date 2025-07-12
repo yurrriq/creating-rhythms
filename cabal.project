@@ -1,5 +1,13 @@
 packages: .
 
+documentation: true
+-- haddock-executables: True
+-- haddock-for-hackage: for-hackage
+haddock-html-location: https://hackage.haskell.org/package/$pkgid/docs/
+haddock-hyperlink-source: True
+haddock-quickjump: True
+haddock-use-unicode: True
+
 source-repository-package
     type: git
     location: https://github.com/bkomuves/combinat.git
