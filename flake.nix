@@ -27,16 +27,37 @@
       flake = {
         overlays.default = _final: prev: {
           haskellPackages = prev.haskellPackages.override {
-            overrides = _hfinal: hprev: {
-              combinat = hprev.callCabal2nix "combinat"
-                (prev.fetchFromGitHub {
-                  owner = "yurrriq";
-                  repo = "combinat";
-                  rev = "4aff8ad8721fc2c006230e0b9d7b2ffc87569186";
-                  hash = "sha256-BDqa4076XnSpysKVlGMMBAzTYnWcddTRZ+8QVKIBI+o=";
-                })
-                { };
-            };
+            overrides = _hfinal: hprev:
+              let
+                inherit (prev.lib.trivial) flip pipe;
+                inherit (prev.haskell.lib) overrideSrc unmarkBroken;
+              in
+              {
+                combinat = pipe hprev.combinat [
+                  (
+                    flip overrideSrc {
+                      src = prev.fetchFromGitHub {
+                        owner = "bkomuves";
+                        repo = "combinat";
+                        rev = "d5a22c2b7205455b3ddee681456d110d5cc7696e";
+                        hash = "sha256-BDqa4076XnSpysKVlGMMBAzTYnWcddTRZ+8QVKIBI+o=";
+                      };
+                      version = "0.2.10.2";
+                    }
+                  )
+                  unmarkBroken
+                ];
+
+                fast-digits = overrideSrc hprev.fast-digits {
+                  src = prev.fetchFromGitHub {
+                    owner = "Bodigrim";
+                    repo = "fast-digits";
+                    rev = "9a492fe4e10a298aa4471ee55fff1481005f891d";
+                    hash = "sha256-0/VjBqsqN0GD1SyaM9mowPnCuCxNejcrrwt2HKA8Y2A=";
+                  };
+                  version = "0.3.2.1";
+                };
+              };
           };
 
           myEmacs = prev.emacsWithPackagesFromUsePackage {
@@ -99,6 +120,7 @@
                 fileset = lib.fileset.unions [
                   ./VERSION
                   ./app
+                  ./cabal.project
                   ./examples
                   ./package.yaml
                   ./src
