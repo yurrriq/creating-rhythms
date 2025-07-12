@@ -7,16 +7,18 @@
 -- Stability   : stable
 -- Portability : POSIX
 --
--- De Bruijn sequences, binary necklaces, binary fold sequences, and conversion
--- between binary strings and lists of intervals.
+-- Binary de Bruijn sequences, fold sequences, necklaces, rhythm definitions,
+-- and conversion between binary strings and lists of intervals.
 module Data.Rhythm.Binary
-  ( module Data.Rhythm.Binary.DeBruijn,
+  ( module Data.Rhythm.Binary.BDF,
+    module Data.Rhythm.Binary.DeBruijn,
     module Data.Rhythm.Binary.FoldSequences,
     module Data.Rhythm.Binary.Intervals,
     module Data.Rhythm.Binary.Necklaces,
   )
 where
 
+import Data.Rhythm.Binary.BDF
 import Data.Rhythm.Binary.DeBruijn
 import Data.Rhythm.Binary.FoldSequences
 import Data.Rhythm.Binary.Intervals
