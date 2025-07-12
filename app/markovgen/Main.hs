@@ -1,7 +1,7 @@
 {-# LANGUAGE LambdaCase #-}
 
 import Data.Rhythm.Markov (markovGen, someTransitionMatrix)
-import Options.Applicative hiding (Failure, Success)
+import Options.Applicative hiding (ParserResult (..))
 import Text.Trifecta (ErrInfo (..), Result (..), parseFromFileEx)
 
 main :: IO ()
