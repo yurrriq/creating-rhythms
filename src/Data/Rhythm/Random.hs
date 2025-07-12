@@ -24,7 +24,16 @@ import Data.Proxy (Proxy (..))
 import Data.Vector.Sized (Vector)
 import Data.Vector.Sized qualified as VS
 import GHC.TypeLits (KnownNat, natVal, type (+))
+import GHC.TypeNats (SomeNat (..), someNatVal)
 import System.Random (randomIO)
+
+-- | See 'randomFinites'.
+randomNumbers :: (MonadIO m) => Integer -> Integer -> Integer -> Integer -> m [Integer]
+randomNumbers maxNumber start correlation n =
+  case (someNatVal (fromIntegral maxNumber + 1), someNatVal (fromIntegral n - 1)) of
+    (SomeNat (_ :: Proxy x), SomeNat (_ :: Proxy y)) ->
+      map getFinite . VS.toList
+        <$> randomFinites @x @y (finite start) (finite correlation)
 
 -- | Generate a vector of random numbers with specified correlation.
 randomFinites ::

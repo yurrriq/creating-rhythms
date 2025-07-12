@@ -108,10 +108,8 @@ executables:
     main: markovgen/Main.hs
     dependencies:
       - CreatingRhythms
-      - finite-typelits
       - optparse-applicative
       - trifecta
-      - vector
   neck:
     <<: *executable
     main: neck/Main.hs
@@ -176,7 +174,7 @@ executables:
     main: pfold/Main.hs
     dependencies:
       - CreatingRhythms
-      - finite-typelits
+      - extra
       - optparse-applicative
   rndint:
     <<: *executable

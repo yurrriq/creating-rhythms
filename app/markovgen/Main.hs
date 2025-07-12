@@ -1,25 +1,20 @@
-import Data.Finite (finite, getFinite)
-import Data.Foldable (toList)
-import Data.Proxy (Proxy)
-import Data.Rhythm.Markov (SomeTransitionMatrix (..), TransitionMatrix (..), markovGen, someTransitionMatrix)
-import GHC.TypeNats (SomeNat (..), someNatVal)
-import Options.Applicative
-import Text.Trifecta (parseFromFile)
+{-# LANGUAGE LambdaCase #-}
+
+import Data.Rhythm.Markov (markovGen, someTransitionMatrix)
+import Options.Applicative hiding (Failure, Success)
+import Text.Trifecta (ErrInfo (..), Result (..), parseFromFileEx)
 
 main :: IO ()
 main =
   do
     (mfile, s, n) <- customExecParser (prefs showHelpOnEmpty) opts
-    case someNatVal (fromIntegral n) of
-      SomeNat (_ :: Proxy steps) ->
-        do
-          maybeMatrix <- parseFromFile someTransitionMatrix mfile
-          case maybeMatrix of
-            Just (SomeTransitionMatrix (matrix :: TransitionMatrix n)) ->
-              print matrix
-                *> markovGen @n @steps matrix (finite @n s)
-                >>= putStrLn . unwords . map (show . getFinite) . toList
-            Nothing -> fail "Invalid transition matrix"
+    parseFromFileEx someTransitionMatrix mfile >>= \case
+      Failure (ErrInfo reason _) ->
+        print reason
+      Success someMatrix ->
+        print someMatrix
+          >> markovGen someMatrix s n
+          >>= putStrLn . unwords . map show
   where
     opts =
       info args $

@@ -1,10 +1,6 @@
 {-# LANGUAGE RecordWildCards #-}
 
-import Data.Finite (finite, getFinite)
-import Data.Foldable (toList)
-import Data.Proxy (Proxy)
-import Data.Rhythm.Random (randomFinites)
-import GHC.TypeNats (SomeNat (..), someNatVal)
+import Data.Rhythm.Random (randomNumbers)
 import Options.Applicative
 
 data Args = Args
@@ -18,12 +14,8 @@ main :: IO ()
 main =
   do
     Args {..} <- customExecParser (prefs showHelpOnEmpty) args
-    case (someNatVal (fromIntegral maxNumber + 1), someNatVal (fromIntegral numbersToGenerate - 1)) of
-      (SomeNat (_ :: Proxy x), SomeNat (_ :: Proxy y)) ->
-        let s = finite @x startingNumber
-            c = finite @x degreeOfCorrelation
-         in randomFinites @x @y s c
-              >>= putStrLn . unwords . map (show . getFinite) . toList
+    putStrLn . unwords . map show
+      =<< randomNumbers maxNumber startingNumber degreeOfCorrelation numbersToGenerate
 
 args :: ParserInfo Args
 args =

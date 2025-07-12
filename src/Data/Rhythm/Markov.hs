@@ -15,6 +15,7 @@ module Data.Rhythm.Markov
   ( TransitionMatrix (..),
     SomeTransitionMatrix (..),
     markovGen,
+    markovGen',
     someTransitionMatrix,
   )
 where
@@ -22,7 +23,7 @@ where
 import Control.Arrow (second)
 import Control.Monad.IO.Class (MonadIO, liftIO)
 import Control.Monad.Loops (unfoldrM)
-import Data.Finite (Finite)
+import Data.Finite (Finite, finite, getFinite)
 import Data.Functor ((<&>))
 import Data.List (intercalate)
 import Data.Maybe (fromJust, fromMaybe)
@@ -81,14 +82,27 @@ someTransitionMatrix =
           Just vec -> pure (SomeTransitionMatrix (TransitionMatrix vec))
           Nothing -> fail "Invalid transition matrix"
 
--- | Generate random numbers using a Markov chain.
+-- | See 'markovGen''.
 markovGen ::
+  (MonadIO m, MonadFail m) =>
+  SomeTransitionMatrix ->
+  Integer ->
+  Integer ->
+  m [Integer]
+markovGen (SomeTransitionMatrix (matrix :: TransitionMatrix n)) s n =
+  case someNatVal (fromIntegral n) of
+    SomeNat (_ :: Proxy steps) ->
+      markovGen' @n @steps matrix (finite @n s) <&> \numbers ->
+        foldr ((:) . getFinite) [] numbers
+
+-- | Generate random numbers using a Markov chain.
+markovGen' ::
   forall n steps m.
   (KnownNat n, KnownNat steps, MonadIO m, MonadFail m) =>
   TransitionMatrix n ->
   Finite n ->
   m (Vector steps (Finite n))
-markovGen (TransitionMatrix matrix) start =
+markovGen' (TransitionMatrix matrix) start =
   fromJust . (VS.fromListN @steps)
     <$> unfoldrM (go . second (VS.index matrix)) (steps, start)
   where
