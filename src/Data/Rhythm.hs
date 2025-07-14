@@ -11,7 +11,6 @@
 -- by Stefan Hollos and J. Richard Hollos.
 module Data.Rhythm
   ( module Data.Rhythm.Binary,
-    module Data.Rhythm.Christoffel,
     module Data.Rhythm.Compositions,
     module Data.Rhythm.ContinuedFractions,
     module Data.Rhythm.Markov,
@@ -22,7 +21,6 @@ module Data.Rhythm
 where
 
 import Data.Rhythm.Binary
-import Data.Rhythm.Christoffel
 import Data.Rhythm.Compositions
 import Data.Rhythm.ContinuedFractions
 import Data.Rhythm.Markov

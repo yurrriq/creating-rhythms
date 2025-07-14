@@ -37,6 +37,7 @@ library:
     - recursion-schemes
     - slist
     - trifecta
+    - typelits-witnesses
     - vector
     - vector-sized
 benchmarks:
