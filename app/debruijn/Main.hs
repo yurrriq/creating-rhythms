@@ -1,16 +1,18 @@
-import Data.Finite (getFinite)
-import Data.Rhythm.Binary (deBruijnSequence)
+import Data.Rhythm.DeBruijn (deBruijnSequence)
 import Options.Applicative
 
 main :: IO ()
 main =
   putStrLn
-    . concatMap (show . getFinite)
-    . deBruijnSequence
+    . concatMap show
+    . uncurry (flip deBruijnSequence)
     =<< customExecParser p opts
   where
     opts =
       info
-        (argument auto (metavar "n"))
-        (fullDesc <> progDesc "Generate the largest de Bruijn sequence of a given order.")
+        ( (,)
+            <$> argument auto (metavar "N" <> help "order")
+            <*> argument auto (metavar "K" <> help "alphabet size" <> showDefault <> value 2)
+        )
+        (fullDesc <> progDesc "Generate the largest de Bruijn sequence.")
     p = prefs showHelpOnEmpty

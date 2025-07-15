@@ -13,6 +13,7 @@ module Data.Rhythm
   ( module Data.Rhythm.Binary,
     module Data.Rhythm.Compositions,
     module Data.Rhythm.ContinuedFractions,
+    module Data.Rhythm.DeBruijn,
     module Data.Rhythm.Markov,
     module Data.Rhythm.Partitions,
     module Data.Rhythm.Permutations,
@@ -23,6 +24,7 @@ where
 import Data.Rhythm.Binary
 import Data.Rhythm.Compositions
 import Data.Rhythm.ContinuedFractions
+import Data.Rhythm.DeBruijn
 import Data.Rhythm.Markov
 import Data.Rhythm.Partitions
 import Data.Rhythm.Permutations

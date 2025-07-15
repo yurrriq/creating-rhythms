@@ -30,6 +30,7 @@ library:
     - extra
     - fast-digits
     - finite-typelits
+    - ghc-typelits-knownnat
     - lens
     - monad-loops
     - mtl
@@ -97,10 +98,6 @@ executables:
   debruijn:
     <<: *executable
     main: debruijn/Main.hs
-    dependencies:
-      - CreatingRhythms
-      - finite-typelits
-      - optparse-applicative
   int2b:
     <<: *executable
     main: int2b/Main.hs
