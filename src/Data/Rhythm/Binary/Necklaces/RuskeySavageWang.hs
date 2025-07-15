@@ -26,20 +26,16 @@ where
 
 import Data.Bits (Bits (complementBit, rotateL, shiftL))
 import Data.FastDigits (digits)
-import Data.Finite (Finite, finite)
 import Data.List (sortOn)
 import Data.List.NonEmpty qualified as NE
 import Data.Ord (Down (..))
 import Data.Tree (Tree (..), flatten, unfoldTree)
 
--- $setup
--- >>> import Data.Finite (getFinite)
-
 -- | All binary necklaces of a given length.
 --
--- >>> map getFinite <$> necklaces 4
+-- >>> necklaces 4
 -- [[1,1,1,1],[1,1,1,0],[1,1,0,0],[1,0,1,0],[1,0,0,0],[0,0,0,0]]
-necklaces :: Int -> [[Finite 2]]
+necklaces :: Int -> [[Int]]
 necklaces !n =
   nodesToNecklaces n $
     flatten (necklaces' n)
@@ -84,12 +80,12 @@ necklaces' !n = Node 0 [unfoldTree search 1]
 
 -- | Convert a list of nodes to binary necklaces of a given length.
 --
--- >>> map getFinite <$> nodesToNecklaces 4 [3,5]
+-- >>> nodesToNecklaces 4 [3,5]
 -- [[1,1,0,0],[1,0,1,0]]
-nodesToNecklaces :: Int -> [Integer] -> [[Finite 2]]
+nodesToNecklaces :: Int -> [Integer] -> [[Int]]
 nodesToNecklaces !n =
   sortOn Down
-    . map (padUpTo n . map (finite . toInteger) . digits 2)
+    . map (padUpTo n . digits 2)
 
 -- modified from Data.FastDigits
 padUpTo :: (Num a) => Int -> [a] -> [a]

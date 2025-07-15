@@ -21,7 +21,6 @@ module Data.Rhythm.Binary.Necklaces.BurrowsWheeler
   )
 where
 
-import Data.Finite (Finite)
 import Data.Functor.Base (ListF (..))
 import Data.Functor.Foldable (ana)
 import Data.IntMap.Strict ((!))
@@ -37,7 +36,7 @@ import Data.Ord (Down (..))
 --
 -- >>> map getFinite <$> necklaces 4
 -- [[1,1,1,1],[1,1,1,0],[1,1,0,0],[1,0,1,0],[1,0,0,0],[0,0,0,0]]
-necklaces :: Int -> [[Finite 2]]
+necklaces :: Int -> [[Int]]
 necklaces n =
   sortOn Down $
     map (reverse . take n . cycle) $

@@ -22,7 +22,6 @@ where
 
 import Control.Bool ((<&&>))
 import Data.Bits (Bits (testBit), popCount)
-import Data.Finite (Finite)
 import Data.IntSet qualified as IntSet
 import Data.List (unfoldr)
 import Data.Rhythm.Binary.Necklaces.RuskeySavageWang qualified as RSW
@@ -35,7 +34,7 @@ import Data.Tree (flatten)
 --
 -- >>> map getFinite <$> necklacesAllowed [1,2,3] 5
 -- [[1,1,1,1,1],[1,1,1,1,0],[1,1,1,0,0],[1,1,0,1,0],[1,0,1,0,0]]
-necklacesAllowed :: [Int] -> Int -> [[Finite 2]]
+necklacesAllowed :: [Int] -> Int -> [[Int]]
 necklacesAllowed allowed n =
   RSW.nodesToNecklaces n $
     filter ((> 0) <&&> isAllowed) $
@@ -47,7 +46,7 @@ necklacesAllowed allowed n =
 --
 -- >>> map getFinite <$> necklacesPopCount 3 6
 -- [[1,1,1,0,0,0],[1,1,0,1,0,0],[1,0,1,1,0,0],[1,0,1,0,1,0]]
-necklacesPopCount :: Int -> Int -> [[Finite 2]]
+necklacesPopCount :: Int -> Int -> [[Int]]
 necklacesPopCount !m !n =
   RSW.nodesToNecklaces n $
     filter ((== m) . popCount) $
@@ -58,7 +57,7 @@ necklacesPopCount !m !n =
 --
 -- >>> map getFinite <$> necklacesPopCountAllowed 3 [1,2,3] 5
 -- [[1,1,1,0,0],[1,1,0,1,0]]
-necklacesPopCountAllowed :: Int -> [Int] -> Int -> [[Finite 2]]
+necklacesPopCountAllowed :: Int -> [Int] -> Int -> [[Int]]
 necklacesPopCountAllowed m allowed n =
   RSW.nodesToNecklaces n $
     filter ((> 0) <&&> ((== m) . popCount) <&&> isAllowed) $

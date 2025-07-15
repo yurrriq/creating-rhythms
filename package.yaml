@@ -111,31 +111,15 @@ executables:
   neck:
     <<: *executable
     main: neck/Main.hs
-    dependencies:
-      - CreatingRhythms
-      - finite-typelits
-      - optparse-applicative
   necka:
     <<: *executable
     main: necka/Main.hs
-    dependencies:
-      - CreatingRhythms
-      - finite-typelits
-      - optparse-applicative
   neckam:
     <<: *executable
     main: neckam/Main.hs
-    dependencies:
-      - CreatingRhythms
-      - finite-typelits
-      - optparse-applicative
   neckm:
     <<: *executable
     main: neckm/Main.hs
-    dependencies:
-      - CreatingRhythms
-      - finite-typelits
-      - optparse-applicative
   part:
     <<: *executable
     main: part/Main.hs
