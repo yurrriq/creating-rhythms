@@ -7,6 +7,7 @@
 
 -- |
 -- Module      : Data.Rhythm.DeBruijn
+-- Description : De Bruijn sequences
 -- Copyright   : (c) Eric Bailey, 2024-2025
 --
 -- License     : MIT
@@ -21,9 +22,14 @@
 --   - De Bruijn Sequence and Universal Cycle Constructions
 --     (2024). http://debruijnsequence.org.
 module Data.Rhythm.DeBruijn
-  ( DeBruijnState (..),
-    deBruijnSequence',
+  ( -- * Ergonomic
     deBruijnSequence,
+
+    -- * Safe
+    deBruijnSequence',
+
+    -- * Determining symbols
+    DeBruijnState (..),
     initialDeBruijnState,
   )
 where
