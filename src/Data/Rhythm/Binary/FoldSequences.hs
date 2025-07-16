@@ -1,9 +1,11 @@
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE ExplicitNamespaces #-}
 {-# LANGUAGE GADTs #-}
+{-# OPTIONS_GHC -fplugin GHC.TypeLits.KnownNat.Solver #-}
 
 -- |
 -- Module      : Data.Rhythm.Binary.FoldSequences
+-- Description : Binary fold sequences
 -- Copyright   : (c) Eric Bailey, 2025
 --
 -- License     : MIT
@@ -13,7 +15,10 @@
 --
 -- Binary fold sequences.
 module Data.Rhythm.Binary.FoldSequences
-  ( foldSequence,
+  ( -- * Ergonomic
+    foldSequence,
+
+    -- * Safe
     foldSequence',
   )
 where
@@ -22,14 +27,9 @@ import Data.Bits (countTrailingZeros, shiftL, (.&.))
 import Data.Bool (bool)
 import Data.Finite (Finite, finite, getFinite)
 import Data.Proxy (Proxy (..))
-import Data.Type.Equality (type (:~:) (..))
 import Data.Vector.Sized (Vector)
 import Data.Vector.Sized qualified as VS
 import GHC.TypeNats (KnownNat, SomeNat (..), natVal, someNatVal, type (^))
-import Unsafe.Coerce (unsafeCoerce)
-
--- $setup
--- >>> import Data.Vector.Sized (toList)
 
 -- | See 'foldSequence''.
 --
@@ -39,14 +39,13 @@ foldSequence :: Int -> Integer -> Integer -> [Integer]
 foldSequence n m f =
   case (someNatVal (fromIntegral n), someNatVal (fromIntegral m)) of
     (SomeNat (_ :: Proxy n), SomeNat (_ :: Proxy m)) ->
-      withKnownNatPower2 @m $ \(_ :: Proxy pow2m) ->
-        foldr ((:) . getFinite) [] $
-          foldSequence' @n @m (finite @pow2m f)
+      foldr ((:) . getFinite) [] $
+        foldSequence' @n @m (finite f)
 
--- | Generate fold sequences from given number of terms, number of bits, and
--- function number \(\{0,\dotsc,2^m-1\}\).
+-- | Generate a fold sequence of @n@ terms with @m@ bits from function number
+-- @f@ \(\in \{0,\dotsc,2^m-1\}\).
 --
--- >>> map getFinite $ toList $ foldSequence' @7 @2 3
+-- >>> map getFinite $ VS.toList $ foldSequence' @7 @2 3
 -- [1,1,0,1,1,0,0]
 foldSequence' :: forall n m. (KnownNat n, KnownNat m) => Finite (2 ^ m) -> Vector n (Finite 2)
 foldSequence' f = VS.map go (VS.enumFromN @n @Int 1)
@@ -59,14 +58,3 @@ foldSequence' f = VS.map go (VS.enumFromN @n @Int 1)
     m = fromIntegral (natVal (Proxy @m))
     g = pow2m - (getFinite f `mod` pow2m) - 1
     pow2m = 2 ^ m
-
-withKnownNatPower2 ::
-  forall m r.
-  (KnownNat m) =>
-  (forall pow2m. (KnownNat pow2m, pow2m ~ (2 ^ m)) => Proxy pow2m -> r) ->
-  r
-withKnownNatPower2 f =
-  case someNatVal (2 ^ natVal (Proxy @m)) of
-    SomeNat (proxyPow2m :: Proxy pow2m) ->
-      case unsafeCoerce Refl :: pow2m :~: (2 ^ m) of
-        Refl -> f proxyPow2m
