@@ -7,7 +7,7 @@ import Text.Trifecta (ErrInfo (..), Result (..), parseFromFileEx)
 main :: IO ()
 main =
   do
-    (filename, repeats) <- customExecParser p opts :: IO (String, Int)
+    (filename, repeats) <- customExecParser p opts
     parseFromFileEx someBinaryRhythmDefinition filename >>= \case
       Failure (ErrInfo reason _) ->
         print reason

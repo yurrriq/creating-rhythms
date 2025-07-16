@@ -96,6 +96,7 @@
 
           inputsFrom = [
             config.pre-commit.devShell
+            self'.packages.creating-rhythms
           ];
 
           nativeBuildInputs = with pkgs; [
@@ -134,7 +135,15 @@
             in
             pkgs.haskell.lib.overrideCabal pkg {
               haddockFlags = [
+                # "--executables"
+                # "--for-hackage"
                 "--html-location='https://hackage.haskell.org/package/$pkgid/docs/'"
+                "--hyperlink-source"
+                "--quickjump"
+                # "--use-unicode"
+              ];
+              librarySystemDepends = [
+                pkgs.zlib
               ];
             };
 

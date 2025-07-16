@@ -6,7 +6,7 @@ documentation: true
 haddock-html-location: https://hackage.haskell.org/package/$pkgid/docs/
 haddock-hyperlink-source: True
 haddock-quickjump: True
-haddock-use-unicode: True
+-- haddock-use-unicode: True
 
 source-repository-package
     type: git
