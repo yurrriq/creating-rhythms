@@ -1,7 +1,6 @@
 module Test.Rhythm.Binary where
 
-import Data.Rhythm.Binary.Necklaces.BurrowsWheeler qualified as BW
-import Data.Rhythm.Binary.Necklaces.RuskeySavageWang qualified as RSW
+import Data.Rhythm.Binary.Necklaces (necklaces)
 import Test.Tasty (TestTree, testGroup)
 import Test.Tasty.HUnit (testCase, (@?=))
 import Text.Printf (printf)
@@ -10,6 +9,6 @@ test_necklaces :: TestTree
 test_necklaces =
   testGroup "Binary necklaces" $
     [ testCase (printf "n = %d" n) $
-        RSW.necklaces n @?= BW.necklaces n
-      | n <- [5, 10, 15]
+        length (necklaces n) @?= k
+      | (n, k) <- [(5, 8), (10, 108), (15, 2192)]
     ]
