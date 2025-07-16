@@ -13,11 +13,17 @@
 module Data.Rhythm.Internal
   ( -- * Parsers
     binaryDigit,
+
+    -- * Vectors
+    cycleVector,
   )
 where
 
 import Control.Applicative ((<|>))
-import Data.Finite (Finite)
+import Data.Finite (Finite, modulo)
+import Data.Vector.Sized (Vector)
+import Data.Vector.Sized qualified as VS
+import GHC.TypeNats (KnownNat)
 import Text.Trifecta (Parser, char, (<?>))
 
 -- $setup
@@ -40,3 +46,11 @@ binaryDigit = zero <|> one
   where
     zero = (0 <$ char '0') <?> "zero"
     one = (1 <$ char '1') <?> "one"
+
+-- | Cycle a vector of length @n@ to produce a vector of length @m@.
+--
+-- Conceptually @'take' m '.' 'cycle'@, but for 'Vector's.
+cycleVector :: forall m n a. (KnownNat m, KnownNat n) => Vector n a -> Vector m a
+cycleVector v = VS.unfoldrN go 0
+  where
+    go i = (v `VS.index` modulo i, i + 1)

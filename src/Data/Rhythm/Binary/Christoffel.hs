@@ -4,6 +4,7 @@
 
 -- |
 -- Module      : Data.Rhythm.Binary.Christoffel
+-- Description : Binary Christoffel words
 -- Copyright   : (c) Eric Bailey, 2025
 --
 -- License     : MIT
@@ -11,18 +12,22 @@
 -- Stability   : stable
 -- Portability : POSIX
 --
--- Christoffel words.
+-- Binary Christoffel words.
 module Data.Rhythm.Binary.Christoffel
-  ( christoffelWord,
+  ( -- * Ergonomic
+    christoffelWord,
+
+    -- * Safe
     christoffelWord',
   )
 where
 
 import Control.Arrow (first, second)
 import Data.Bool (bool)
-import Data.Finite (Finite, getFinite, modulo)
+import Data.Finite (Finite, getFinite)
 import Data.Proxy (Proxy (..))
 import Data.Ratio (denominator, numerator)
+import Data.Rhythm.Internal (cycleVector)
 import Data.Vector.Sized (Vector)
 import Data.Vector.Sized qualified as VS
 import GHC.TypeLits.Witnesses (SNat (..), (%+), (%-))
@@ -84,9 +89,3 @@ christoffelWord' isUpperWord =
     n, d :: Integer
     n = fromIntegral (natVal (Proxy @n))
     d = fromIntegral (natVal (Proxy @d))
-
--- | Cycle a vector of length @n@ to produce a vector of length @m@.
-cycleVector :: forall m n a. (KnownNat m, KnownNat n) => Vector n a -> Vector m a
-cycleVector v = VS.unfoldrN go 0
-  where
-    go i = (v `VS.index` modulo i, i + 1)
