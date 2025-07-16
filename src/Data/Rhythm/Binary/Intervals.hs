@@ -1,5 +1,6 @@
 -- |
 -- Module      : Data.Rhythm.Binary.Intervals
+-- Description : Intervals encoded as binary strings
 -- Copyright   : (c) Eric Bailey, 2025
 --
 -- License     : MIT
