@@ -113,6 +113,10 @@
             nixd
             timidity
           ];
+
+          shellHook = ''
+            export LD_LIBRARY_PATH="${lib.makeLibraryPath [ pkgs.zlib ] }"
+          '';
         };
 
         packages = {
