@@ -1,5 +1,6 @@
 -- |
 -- Module      : Data.Rhythm.Compositions
+-- Description : Combinatorial compositions
 -- Copyright   : (c) Eric Bailey, 2024-2025
 --
 -- License     : MIT
@@ -57,7 +58,7 @@ compositionsAllowed allowed = filter (all (`elem` allowed)) . compositions
 -- >>> let fact n = product [1 .. n]
 -- >>> _C 2 5 == fact (5 - 1) `div` (fact (2 - 1) * fact (5 - 2))
 -- True
-compositionsLength :: Int -> Int -> [[Int]]
+compositionsLength :: Int -> Int -> [Composition]
 compositionsLength = compositions1
 
 -- | Positive compositions of a given length with allowed parts.
