@@ -51,7 +51,7 @@ necklaces !n =
 
 -- | All binary necklaces of a given length with allowed parts.
 --
--- >>> map getFinite <$> necklacesAllowed [1,2,3] 5
+-- >>> necklacesAllowed [1,2,3] 5
 -- [[1,1,1,1,1],[1,1,1,1,0],[1,1,1,0,0],[1,1,0,1,0],[1,0,1,0,0]]
 necklacesAllowed :: [Int] -> Int -> [[Int]]
 necklacesAllowed allowed n =
@@ -63,7 +63,7 @@ necklacesAllowed allowed n =
 
 -- | All binary necklaces with a given number of ones of a given length.
 --
--- >>> map getFinite <$> necklacesPopCount 3 6
+-- >>> necklacesPopCount 3 6
 -- [[1,1,1,0,0,0],[1,1,0,1,0,0],[1,0,1,1,0,0],[1,0,1,0,1,0]]
 necklacesPopCount :: Int -> Int -> [[Int]]
 necklacesPopCount !m !n =
@@ -74,7 +74,7 @@ necklacesPopCount !m !n =
 -- | All binary necklaces with a given number of ones of a given length with
 -- allowed parts.
 --
--- >>> map getFinite <$> necklacesPopCountAllowed 3 [1,2,3] 5
+-- >>> necklacesPopCountAllowed 3 [1,2,3] 5
 -- [[1,1,1,0,0],[1,1,0,1,0]]
 necklacesPopCountAllowed :: Int -> [Int] -> Int -> [[Int]]
 necklacesPopCountAllowed m allowed n =

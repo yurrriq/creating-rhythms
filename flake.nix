@@ -149,6 +149,9 @@
               librarySystemDepends = [
                 pkgs.zlib
               ];
+              testHaskellDepends = [
+                pkgs.haskellPackages.doctest
+              ];
             };
 
           default = self'.packages.creating-rhythms;
@@ -156,6 +159,13 @@
 
         pre-commit.settings.hooks = {
           convco.enable = true;
+          doctest = {
+            enable = true;
+            entry = "${lib.getExe pkgs.cabal-install} repl --repl-options='-w -Wdefault -XDataKinds' --with-compiler=doctest";
+            name = "doctest";
+            pass_filenames = false;
+            types = [ "haskell" ];
+          };
           editorconfig-checker.enable = true;
           treefmt.enable = true;
         };
