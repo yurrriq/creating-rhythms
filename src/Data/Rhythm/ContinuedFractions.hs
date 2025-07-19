@@ -33,6 +33,7 @@ import Data.List (intercalate)
 import Data.List.NonEmpty (NonEmpty (..))
 import Data.Maybe (listToMaybe)
 import Data.Tuple.Extra (thd3)
+import GHC.Generics (Generic)
 
 -- | A 'ContinuedFraction' is a 'NonEmpty', potentially infinite, list of
 -- integer 'terms'.
@@ -41,7 +42,7 @@ import Data.Tuple.Extra (thd3)
 -- [1;2,3,4]
 newtype ContinuedFraction = ContinuedFraction
   {terms :: NonEmpty Integer}
-  deriving (Eq, Ord)
+  deriving (Eq, Generic, Ord)
 
 instance Show ContinuedFraction where
   show (ContinuedFraction (x :| xs)) =
