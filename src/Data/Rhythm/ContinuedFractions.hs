@@ -1,5 +1,6 @@
 -- |
 -- Module      : Data.Rhythm.ContinuedFractions
+-- Description : Simple continued fractions
 -- Copyright   : (c) Eric Bailey, 2024-2025
 --
 -- License     : MIT
