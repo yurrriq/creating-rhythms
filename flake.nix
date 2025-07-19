@@ -104,6 +104,7 @@
             cabal-install
             ghc
             ghcid
+            haskellPackages.doctest
             haskell-language-server
             haskellPackages.hpack
             haskellPackages.hlint
@@ -148,9 +149,6 @@
               ];
               librarySystemDepends = [
                 pkgs.zlib
-              ];
-              testHaskellDepends = [
-                pkgs.haskellPackages.doctest
               ];
             };
 
