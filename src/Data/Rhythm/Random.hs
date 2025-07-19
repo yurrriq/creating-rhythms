@@ -3,6 +3,7 @@
 
 -- |
 -- Module      : Data.Rhythm.Random
+-- Description : Correlated random numbers
 -- Copyright   : (c) Eric Bailey, 2025
 --
 -- License     : MIT

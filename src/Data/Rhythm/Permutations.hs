@@ -1,5 +1,6 @@
 -- |
 -- Module      : Data.Rhythm.Permutations
+-- Description : Integer permutations
 -- Copyright   : (c) Eric Bailey, 2025
 --
 -- License     : MIT

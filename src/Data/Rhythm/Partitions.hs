@@ -1,5 +1,6 @@
 -- |
 -- Module      : Data.Rhythm.Partitions
+-- Description : Integer partitions
 -- Copyright   : (c) Eric Bailey, 2024-2025
 --
 -- License     : MIT
