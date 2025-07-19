@@ -3,6 +3,7 @@
 
 -- |
 -- Module      : Data.Rhythm.Markov
+-- Description : Transition matrices and Markov chains
 -- Copyright   : (c) Eric Bailey, 2025
 --
 -- License     : MIT
@@ -38,7 +39,20 @@ import System.Random (randomIO)
 import Text.Printf (printf)
 import Text.Trifecta (Parser, count, decimal, double, newline)
 
+-- $setup
+-- >>> import Data.Ix (inRange)
+
 -- | An \(n \times n\) transition matrix.
+--
+-- For example, the following is a @'TransitionMatrix' 3@.
+--
+-- \[
+--   \begin{bmatrix}
+--     0.1 & 0.6 & 0.3 \\
+--     0.4 & 0.4 & 0.2 \\
+--     0.3 & 0.3 & 0.4
+--   \end{bmatrix}
+-- \]
 newtype TransitionMatrix (n :: Nat) = TransitionMatrix
   { unTransitionMatrix :: Vector n (Vector n Double)
   }
@@ -65,7 +79,7 @@ instance IsList SomeTransitionMatrix where
       case someNatVal (fromIntegral (len (fromList rows))) of
         SomeNat (_ :: Proxy n) ->
           SomeTransitionMatrix . TransitionMatrix
-            <$> (VS.fromListN @n =<< traverse VS.fromListN rows)
+            <$> (VS.fromList @n =<< traverse VS.fromList rows)
 
   toList (SomeTransitionMatrix (TransitionMatrix matrix)) =
     VS.toList <$> VS.toList matrix
@@ -75,14 +89,18 @@ someTransitionMatrix :: Parser SomeTransitionMatrix
 someTransitionMatrix =
   do
     n <- fromInteger <$> decimal <* newline
-    rows <- count n (count n double)
-    case someNatVal (fromIntegral n) of
-      SomeNat (_ :: Proxy n) ->
-        case traverse (VS.fromList @n) rows >>= VS.fromList of
-          Just vec -> pure (SomeTransitionMatrix (TransitionMatrix vec))
-          Nothing -> fail "Invalid transition matrix"
+    fromList <$> count n (count n double)
 
--- | See 'markovGen''.
+-- | Generate random numbers using a Markov chain.
+--
+-- >>> let matrix = fromList [[0.1,0.6,0.3],[0.4,0.4,0.2],[0.3,0.3,0.4]]
+-- >>> let numbers = markovGen matrix 1 10
+-- >>> (== 10) . length <$> numbers
+-- True
+-- >>> all (inRange (0,2)) <$> numbers
+-- True
+--
+-- See 'markovGen''.
 markovGen ::
   (MonadIO m, MonadFail m) =>
   SomeTransitionMatrix ->
@@ -95,7 +113,7 @@ markovGen (SomeTransitionMatrix (matrix :: TransitionMatrix n)) s n =
       markovGen' @n @steps matrix (finite @n s) <&> \numbers ->
         foldr ((:) . getFinite) [] numbers
 
--- | Generate random numbers using a Markov chain.
+-- | See 'markovGen'.
 markovGen' ::
   forall n steps m.
   (KnownNat n, KnownNat steps, MonadIO m, MonadFail m) =>
@@ -103,7 +121,7 @@ markovGen' ::
   Finite n ->
   m (Vector steps (Finite n))
 markovGen' (TransitionMatrix matrix) start =
-  fromJust . (VS.fromListN @steps)
+  fromJust . (VS.fromList @steps)
     <$> unfoldrM (go . second (VS.index matrix)) (steps, start)
   where
     go (0, _) = pure Nothing
